@@ -49,24 +49,26 @@ class Bot(commands.Bot):
         self.database = Database(self.database_path)
         self.token:str = os.getenv("TOKEN")
 
-        @commands.check
         def is_administrator(ctx:commands.Context):
             return ctx.author.id in self.setting.admins
         
         @self.command()
+        @commands.check(is_administrator)
         async def load(ctx:commands.Context, extension:str = None, folder:str = "commands"):
             load_extension(self, folder) if not extension else self.load_extension(f"{folder}.{extension}")
             await ctx.reply("loading end!")
 
         @self.command()
+        @commands.check(is_administrator)
         async def unload(ctx, extension:str = None, folder:str = "commands"):
             load_extension(self, folder, "unload") if not extension else self.unload_extension(f"{folder}.{extension}")
-            await ctx.reply("unloading end")
+            await ctx.reply("unloading end!")
 
         @self.command()
+        @commands.check(is_administrator)
         async def reload(ctx, extension:str = None, folder:str = "commands"):
             load_extension(self, folder, "reload") if not extension else self.reload_extension(f"{folder}.{extension}")
-            await ctx.reply("reloading end")
+            await ctx.reply("reloading end!")
 
     def setup(self):
         return [load_extension(self,folder) for folder in self.setting.cog["folder"]]

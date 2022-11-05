@@ -6,7 +6,7 @@ from core.classes import CogExtension
 
 class General(CogExtension):
 
-    @commands.command(name="",description="管理你的暱稱")
+    @commands.command(description="管理你的暱稱")
     async def nick(self, ctx:commands.Context):
         embed = discord.Embed(
             title="暱稱修改系統 (beta)",
