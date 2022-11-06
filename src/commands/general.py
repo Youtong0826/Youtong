@@ -1,8 +1,10 @@
 import discord
+
 from discord.ext import commands
 from datetime import datetime
 
 from core.classes import CogExtension
+from core.functions import is_emoji
 
 class General(CogExtension):
 
@@ -47,27 +49,28 @@ class General(CogExtension):
 
                 async def modal_callback(interaction:discord.Interaction):
                     nick = modal.children[0].value
-                    await interaction.user.edit(nick="〡"+nick)
-                    await interaction.response.send_message("已成功修改您的暱稱~",ephemeral=True)
+                    if nick not in self.bot.database.block_words and not is_emoji(nick):
+                        await interaction.user.edit(nick="〡"+nick)
+                        await interaction.response.send_message("已成功修改您的暱稱~", ephemeral=True)
                 
                 async def on_modal_error(error:Exception, interaction:discord.Interaction):
                     embed = discord.Embed(
-                        title="指令出了點問題>< 請您將錯誤回報給開發者們",
+                        title="指令出了點問題>< 請你將錯誤回報給開發者們",
                         description=f"```{error}```"
                     )
 
-                    await interaction.response.send_message(embed=embed,ephemeral=True)
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
 
-                modal = discord.ui.Modal(new_nick,title="修改你的暱稱")
+                modal = discord.ui.Modal(new_nick, title="修改你的暱稱")
                 modal.callback = modal_callback
                 modal.on_error = on_modal_error
 
                 await interaction.response.send_modal(modal)
 
             elif interaction.custom_id == "check":
-                await interaction.response.send_message("此功能尚在製作中~",ephemeral=True)
+                await interaction.response.send_message("此功能尚在製作中~", ephemeral=True)
 
-        for button in [modify,check_cooldown]:button.callback = callback
+        for button in [modify, check_cooldown]:button.callback = callback
 
         await ctx.reply(
             embed=embed,
