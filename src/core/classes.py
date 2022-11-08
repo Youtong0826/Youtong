@@ -28,7 +28,7 @@ class Database(Database):
             "block_words":self.block_words
         }
 
-    def append(self, key, more ,mode="int") -> any:
+    def append(self, key, more, mode="int") -> any:
         """
         if mode `int` that will add more to the value of key. 
         if mode `list` that will append new obj to the value(list) of key
@@ -37,18 +37,18 @@ class Database(Database):
             return super().append(key, more) 
 
         elif mode == "list":
-            data = self.get(key)
-            data.append(more)
-
+            data = list(self.get(key))
+            data += more if isinstance(more,list) else data.append(more)
+                
         return self.set(key,data)
             
     def reset(self) -> None:
         "reset all the value "
-        return [self.set(key,None) for key in self.get_all_key()]
+        return [self.set(key, None) for key in self.get_all_key()]
 
     def set_block_roles(self, new:List[discord.Role]) :
         "set the new value to the `block_roles`"
-        
+
         return None if not self.get("block_roles") else (self.set("block_roles", new) if isinstance(new, list) else None)
 
     def set_block_words(self, new:List[discord.Role]):
@@ -59,11 +59,11 @@ class Database(Database):
     def append_block_roles(self, role:discord.Role) -> None:
         "append the value to the `block_roles`"
 
-        return None if not self.get("block_roles") else self.append("block_words", role)
+        return None if not self.get("block_roles") else self.append("block_words", role, "list")
 
-    def append_block_words(self, channel:discord.abc.GuildChannel)  -> None:
+    def append_block_words(self, words:str)  -> None:
         "append the value to the `block_words`"
-        return None if not self.get("block_words") else self.append("block_words", channel)
+        return None if not self.get("block_words") else self.append("block_words", words, "list")
 
     @property
     def block_roles(self) -> list:
@@ -98,11 +98,11 @@ class Setting:
         return self.add_category("managements", {"admin":self.admins})
 
     def add_cog(self, key:str, value:Any):
-        "add new data at the cog"
+        "add new data in the cog"
         return self.add_category("cog", {key:value})
 
     def add_database(self, key:str, value:Any):
-        "add new data at the database"
+        "add new data in the database"
         return self.add_category("database", {key:value})
 
 class Bot(commands.Bot):
@@ -114,34 +114,41 @@ class Bot(commands.Bot):
         self.database = Database(self.database_path)
         self.token:str = os.getenv("TOKEN")
 
-        def is_administrator(ctx:commands.Context):
-            return ctx.author.id in self.setting.admins
-        
+    def is_administrator(self,ctx:commands.Context):
+        return ctx.author.id in self.setting.admins
+
+    def setup(self):
+        "setup the bot"
+        default = self.setting.database["default_block_words"]
+        if default not in self.database.block_words:
+            self.database.append_block_words(default)
+
+        [load_extension(self,folder) for folder in self.setting.cog["folder"]]
+
         @self.command()
-        @commands.check(is_administrator)
+        @commands.check(self.is_administrator)
         async def load(ctx:commands.Context, extension:str = None, folder:str = "commands"):
             load_extension(self, folder) if not extension else self.load_extension(f"{folder}.{extension}")
             await ctx.reply("loading end!")
 
         @self.command()
-        @commands.check(is_administrator)
-        async def unload(ctx, extension:str = None, folder:str = "commands"):
+        @commands.check(self.is_administrator)
+        async def unload(ctx:commands.Context, extension:str = None, folder:str = "commands"):
             load_extension(self, folder, "unload") if not extension else self.unload_extension(f"{folder}.{extension}")
             await ctx.reply("unloading end!")
 
         @self.command()
-        @commands.check(is_administrator)
-        async def reload(ctx, extension:str = None, folder:str = "commands"):
+        @commands.check(self.is_administrator)
+        async def reload(ctx:commands.Context, extension:str = None, folder:str = "commands"):
             load_extension(self, folder, "reload") if not extension else self.reload_extension(f"{folder}.{extension}")
             await ctx.reply("reloading end!")
 
-    def setup(self):
-        "setup the bot"
-        return [load_extension(self,folder) for folder in self.setting.cog["folder"]]
+        return None
+
 
 class CogExtension(discord.Cog):
     def __init__(self,bot:Bot) -> None:
         self.bot = bot
 
 if __name__ == "__main__":
-    pass
+    print(list([]))
