@@ -8,7 +8,7 @@ from typing import (
     List
 )
 
-from functions import (
+from core.functions import (
     write_json,
     read_json
 )
