@@ -1,9 +1,6 @@
 import discord
-import json
-import os
 
 from quick_sqlite import Database
-from discord.ext import commands
 from dotenv import load_dotenv
 
 from typing import (
@@ -11,8 +8,7 @@ from typing import (
     List
 )
 
-from core.functions import (
-    load_extension,
+from functions import (
     write_json,
     read_json
 )
@@ -27,6 +23,10 @@ class Database(Database):
             "block_roles":self.block_roles,
             "block_words":self.block_words
         }
+
+    def __str__(self) -> str:
+        all = super().get_all()
+        return str([(item.key, item.value) for item in all])
 
     def append(self, key, more, mode="int") -> any:
         """
@@ -51,7 +51,7 @@ class Database(Database):
 
         return None if not self.get("block_roles") else (self.set("block_roles", new) if isinstance(new, list) else None)
 
-    def set_block_words(self, new:List[discord.Role]):
+    def set_block_words(self, new:List[str]):
         "set the new value to the `block_words`"
 
         return None if not self.get("block_words") else (self.set("block_words", new) if isinstance(new, list) else None)
@@ -80,75 +80,26 @@ class Database(Database):
         return self.get("block_words")
 
 class Setting:
-    def __init__(self, path:str) -> None:
+    def __init__(self, path:str, categories:list = []) -> None:
         self._setting:dict = read_json(path)
-        self.database = self._setting.get("database",{})
-        self.general = self._setting.get("general",{})
-        self.admins:list = self._setting.get("managements",{}).get("admin",[])
-        self.cog:dict = self._setting.get("cog",{})
+
+        self.general = self._setting.get("general", {})
+        self.managements = self._setting.get("managements", {})
+
+        self.database = self._setting.get("database", {})
+        self.checks = self._setting.get("checks", {})
         self.path = path
 
+    def __str__(self) -> str:
+        return str(self._setting)
+
+    def add(self, category:str, key:str, value):
+        "add data"
+        return write_json(self.path, category, {key : value})
+
     def add_category(self, name:str, default:dict={}):
-        "add new category"
+        "add new category or value"
         return write_json(self.path, name ,default)
 
-    def add_admin(self, id:int):
-        "add new admin(id)"
-        self.admins.append(id)
-        return self.add_category("managements", {"admin":self.admins})
-
-    def add_cog(self, key:str, value:Any):
-        "add new data in the cog"
-        return self.add_category("cog", {key:value})
-
-    def add_database(self, key:str, value:Any):
-        "add new data in the database"
-        return self.add_category("database", {key:value})
-
-class Bot(commands.Bot):
-    def __init__(self,command_prefix="!", description=None, setting_path="setting", *args, **options):
-        super().__init__(command_prefix, description, *args, **options)
-
-        self.setting = Setting(setting_path)
-        self.database_path = self.setting.database.get("path","bot.db")
-        self.database = Database(self.database_path)
-        self.token:str = os.getenv("TOKEN")
-
-    def is_administrator(self,ctx:commands.Context):
-        return ctx.author.id in self.setting.admins
-
-    def setup(self):
-        "setup the bot"
-        default = self.setting.database["default_block_words"]
-        if default not in self.database.block_words:
-            self.database.append_block_words(default)
-
-        [load_extension(self,folder) for folder in self.setting.cog["folder"]]
-
-        @self.command()
-        @commands.check(self.is_administrator)
-        async def load(ctx:commands.Context, extension:str = None, folder:str = "commands"):
-            load_extension(self, folder) if not extension else self.load_extension(f"{folder}.{extension}")
-            await ctx.reply("loading end!")
-
-        @self.command()
-        @commands.check(self.is_administrator)
-        async def unload(ctx:commands.Context, extension:str = None, folder:str = "commands"):
-            load_extension(self, folder, "unload") if not extension else self.unload_extension(f"{folder}.{extension}")
-            await ctx.reply("unloading end!")
-
-        @self.command()
-        @commands.check(self.is_administrator)
-        async def reload(ctx:commands.Context, extension:str = None, folder:str = "commands"):
-            load_extension(self, folder, "reload") if not extension else self.reload_extension(f"{folder}.{extension}")
-            await ctx.reply("reloading end!")
-
-        return None
-
-
-class CogExtension(discord.Cog):
-    def __init__(self,bot:Bot) -> None:
-        self.bot = bot
-
 if __name__ == "__main__":
-    print(list([]))
+    pass
