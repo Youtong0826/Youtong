@@ -32,6 +32,9 @@ class Bot(commands.Bot):
         self.cooldown = self.setting.managements.get("cooldown", [0, 0, 0])
         self.vips = self.setting.managements.get("vips", [0, 0, 0])
 
+    def is_administrator(self, ctx:commands.Context):
+        return (ctx.author.guild_permissions.administrator() or ctx.author.id in self.vips)
+
     def is_available_channel(self, ctx:commands.Context):
         return ctx.channel.id in self.setting.checks["channel"]
 
@@ -48,7 +51,7 @@ class Bot(commands.Bot):
         if default not in list(self.database.block_words) and len(default) > 0:
             self.database.append_block_words(default)
 
-        [load_extension(self,folder) for folder in self.setting.cog["folder"]]
+        [load_extension(self,folder) for folder in self.setting.cog.get("folder", [])]
 
         if self.setting.general["version"][0] < 1:
             self.add_check(self.is_test_channel)
