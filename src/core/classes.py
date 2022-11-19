@@ -82,12 +82,11 @@ class Database(Database):
 class Setting:
     def __init__(self, path:str, categories:list = []) -> None:
         self._setting:dict = read_json(path)
-
         self.general = self._setting.get("general", {})
         self.managements = self._setting.get("managements", {})
-
         self.database = self._setting.get("database", {})
         self.checks = self._setting.get("checks", {})
+        self.cog = self._setting.get("cog",{})
         self.path = path
 
     def __str__(self) -> str:
