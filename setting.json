@@ -1,33 +1,26 @@
 {
     "general":{
         "name":"Nick Modifier",
-        "id":"1038116431683932180",
+        "id":1038116431683932180,
+        "version":[0, 1, 0],
         "avatar_url":"https://cdn.discordapp.com/avatars/1038116431683932180/00fda8b8f2f999fd02af866f897cfc8d.png?size=1024"
+    },
+    "managements":{
+        "cooldown":[0, 30, 0],
+        "vips":[
+            856041155341975582
+        ]
+    },
+    "database":{
+        "path":"bot.db"
+    },
+    "checks":{
+        "channel":[],
+        "test_channel":[739051832617336864]
     },
     "cog":{
         "folder":[
             "commands"
         ]
-    },
-    "managements":{
-        "admin":[
-            856041155341975582,
-            305389581304463360
-        ]
-    },
-    "database":{
-        "path":"bot.db",
-        "default_block_words":[
-            "ㄅ", "ㄆ", "ㄇ", "ㄈ", "ㄉ", "ㄊ", "ㄋ", "ㄌ", "ㄍ", 
-            "ㄎ", "ㄏ", "ㄐ", "ㄑ", "ㄒ", "ㄔ", "ㄕ", "ㄖ", "ㄗ", 
-            "ㄘ", "ㄙ", "ㄧ", "ㄨ", "ㄩ", "ㄚ", "ㄛ", "ㄜ", "ㄝ", 
-            "ㄞ", "ㄟ", "ㄠ", "ㄡ", "ㄢ", "ㄣ", "ㄤ", "ㄥ", "ㄦ",
-            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-            "<emoji>"
-        ]
-    },
-    "test":{
-        "dd":"Dd",
-        "rr":"ee"
     }
 }

@@ -1,6 +1,6 @@
 import discord
 
-from core.classes import Bot
+from core.bot import Bot
 
 bot = Bot(
     intents = discord.Intents.all(),
