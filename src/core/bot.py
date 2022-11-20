@@ -33,7 +33,7 @@ class Bot(commands.Bot):
         self.vips = self.setting.managements.get("vips", [0, 0, 0])
 
     def is_administrator(self, ctx:commands.Context):
-        return (ctx.author.guild_permissions.administrator() or ctx.author.id in self.vips)
+        return ctx.author.guild_permissions.administrator() or (ctx.author.id in self.vips)
 
     def is_available_channel(self, ctx:commands.Context):
         return ctx.channel.id in self.setting.checks["channel"]
