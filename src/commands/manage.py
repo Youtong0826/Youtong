@@ -7,53 +7,53 @@ class Manage(CogExtension):
     
     async def setting(self, ctx:commands.Context):
         embed = discord.Embed(
-            title="伺服器設定",
-            description="請透過下方按鈕來進行操作",
+            title="設定",
+            description="請從底下選單進行下一步操作"
         )
 
-        nick = discord.ui.Button(
-            style=discord.ButtonStyle.primary,
-            label="預設暱稱格式設定",
-            custom_id="nick_setting",
-            emoji="📃"
-        )
+        options = {
+            "nick_setting":{
+                "label":"暱稱設定",
+                "emoji":"📰"
+            },
+            "words_setting":{
+                "label":"文字設定",
+                "emoji":"📃"
+            },
+            "roles_setting":{
+                "label":"身分組設定",
+                "emoji":"📜"
+            },
+            "other_setting":{
+                "label":"其他設定",
+                "emoji":"🔧"
+            }
+        }
 
-        words = discord.ui.Button(
-            style=discord.ButtonStyle.success,
-            label="文字設定",
-            custom_id="words_setting",
-            emoji="📰"
+        select = discord.ui.Select(
+            custom_id="main_select_setting",
+            placeholder="請選擇下一步操作",
+            options=[
+                discord.SelectOption(
+                    value=value,
+                    label=option["label"],
+                    emoji=option["emoji"]
+                )
+                for value,option in options.items()
+            ]
         )
-
-        role = discord.ui.Button(
-            style=discord.ButtonStyle.primary,
-            label="身分組設定",
-            custom_id="role_setting",
-            emoji="📜",
-            row=1
-        )
-
-        other = discord.ui.Button(
-            style=discord.ButtonStyle.gray,
-            label="其他設定",
-            custom_id="other_setting",
-            emoji="🔧",
-            row=1
-        )
-
-        item = nick,words,role,other
 
         if isinstance(ctx, commands.Context):
             await ctx.reply(
                 embed=embed,
-                view=discord.ui.View(*item, timeout=None),
+                view=discord.ui.View(select, timeout=None),
                 mention_author=False
             )
 
         else:
             await ctx.respond(
                 embed=embed,
-                view=discord.ui.View(*item, timeout=None),
+                view=discord.ui.View(select, timeout=None),
             )
 
     @discord.application_command(name="設定", description="管理機器人設定")
@@ -66,12 +66,10 @@ class Manage(CogExtension):
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction:discord.Interaction):
-        if not interaction.custom_id: return
-        
-        if interaction.custom_id.endswith("_setting"):
+
+        if interaction.custom_id is not None and interaction.custom_id.endswith("_setting"):
             match interaction.custom_id.replace("_setting", ""):
                 case "nick":
-
                     await interaction.response.send_modal(
                         discord.ui.Modal(
                             discord.ui.InputText(
@@ -82,7 +80,7 @@ class Manage(CogExtension):
                                 label="暱稱後方的預設值",
                                 placeholder="輸入指定的預設格式(在暱稱後方)",
                             ),
-                            title="暱稱預設格式設定", 
+                            title="暱稱格式設定", 
                             custom_id="nick_modal_setting"
                         )
                     )
@@ -99,7 +97,7 @@ class Manage(CogExtension):
                                 placeholder="輸入指定的文字"
                             ),
                             title="文字設定", 
-                            custom_id="nick_modal_setting"
+                            custom_id="words_modal_setting"
                         )
                     )
 
@@ -118,9 +116,59 @@ class Manage(CogExtension):
                             ),
                             discord.ui.Button(
                                 style=discord.ButtonStyle.danger,
-                                label="管理權的身分組",
+                                label="具有管理權的身分組",
                                 custom_id="admin_roles_setting",
                                 emoji="⚙️"
+                            ),
+                            timeout=None
+                        ),
+                        ephemeral=True
+                    )
+                
+                case "block_roles":
+                    await interaction.response.send_message(
+                        embed=discord.Embed(
+                            title="禁用身分組設定",
+                            description="請從以下選單選擇身分組"
+                        ),
+                        view=discord.ui.View(
+                            discord.ui.Select(
+                                placeholder="選擇身分組",
+                                max_values=25,
+                                options=[
+                                    discord.SelectOption(
+                                        label=role.name,
+                                        value=role.id,
+                                        emoji=role.unicode_emoji,
+                                    )
+                                    for role in interaction.guild.roles
+                                ],
+                                custom_id="block_roles_select_setting"
+                            ),
+                            timeout=None
+                        ),
+                        ephemeral=True
+                    )
+
+                case "admin_roles":
+                    await interaction.response.send_message(
+                        embed=discord.Embed(
+                            title="管理權身分組設定",
+                            description="請從以下選單選擇身分組"
+                        ),
+                        view=discord.ui.View(
+                            discord.ui.Select(
+                                placeholder="選擇身分組",
+                                max_values=25,
+                                options=[
+                                    discord.SelectOption(
+                                        label=role.name,
+                                        value=role.id,
+                                        emoji=role.unicode_emoji,
+                                    )
+                                    for role in interaction.guild.roles
+                                ],
+                                custom_id="admin_roles_select_setting"
                             ),
                             timeout=None
                         ),
@@ -129,7 +177,7 @@ class Manage(CogExtension):
 
                 case "other":
                     await interaction.response.send_message(
-                        "此功能暫時停用",
+                        "此功能暫時停用~",
                         ephemeral=True
                     )
 
