@@ -20,7 +20,7 @@ class General(CogExtension):
 
         embed.add_field(
             name="暱稱修改規則",
-            value="新的暱稱只允許使用 **數字、英文、中文、日文、韓文**\n其他不能使用的字元像是 **注音、表情符號** 等 **特殊符號**"
+            value="**1.** 新的暱稱只允許使用 **數字、英文、中文、日文、韓文**\n**2.** 不能使用的字元像是 **注音、表情符號** 等 **特殊符號**"
         )
 
         embed.add_field(
@@ -85,9 +85,9 @@ class General(CogExtension):
                     max_length=16
                 )        
 
-                async def on_modal_error(error:Exception, interaction:discord.Interaction):
+                async def on_modal_error(self, error:Exception, interaction:discord.Interaction):
                     embed = discord.Embed(
-                        title="指令出了點問題>< 請你將錯誤回報給開發者們",
+                        title="好像出了點問題>< 請你將錯誤回報給開發者們",
                         description=f"```{error}```"
                     )
                     await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -98,7 +98,7 @@ class General(CogExtension):
                 await interaction.response.send_modal(modal)
 
             case "check":
-                cooldown:list = self.bot.setting.general["cooldown"]
+                cooldown:list = self.bot.setting.managements.get("cooldown", [0, 0, 0])
                 
                 embed = discord.Embed(
                     title="冷卻時間",
@@ -121,6 +121,8 @@ class General(CogExtension):
 
                 await interaction.user.edit(nick="〡"+nick)
                 await interaction.response.send_message("已成功修改你的暱稱~", ephemeral=True)
+
+
 
 def setup(bot):
     bot.add_cog(General(bot))

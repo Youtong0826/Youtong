@@ -26,7 +26,7 @@ class Bot(commands.Bot):
         self.token:str = os.getenv("TOKEN")
 
         self.version = self.setting.general.get("version", [0, 0, 0])
-        self.avatar = self.setting.general.get("avatar")
+        self.avatar = self.setting.general.get("avatar_url", "")
         self.id = self.setting.general.get("id",0)
 
         self.cooldown = self.setting.managements.get("cooldown", [0, 0, 0])
