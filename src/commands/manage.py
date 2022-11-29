@@ -80,10 +80,12 @@ class Manage(CogExtension):
                                     discord.ui.InputText(
                                         label="暱稱前方的預設值",
                                         placeholder="請輸入指定的預設格式(在暱稱前方)",
+                                        required=False
                                     ), 
                                     discord.ui.InputText(
                                         label="暱稱後方的預設值",
                                         placeholder="輸入指定的預設格式(在暱稱後方)",
+                                        required=False
                                     ),
                                     title="暱稱格式設定", 
                                     custom_id="nick_modal_setting"

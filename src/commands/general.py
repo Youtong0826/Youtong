@@ -85,17 +85,17 @@ class General(CogExtension):
                     max_length=16
                 )        
 
-                async def on_modal_error(self, error:Exception, interaction:discord.Interaction):
+                async def on_modal_error(error:Exception, interaction:discord.Interaction):
                     embed = discord.Embed(
                         title="好像出了點問題>< 請你將錯誤回報給開發者們",
                         description=f"```{error}```"
                     )
-                    await interaction.response.send_message(embed=embed, ephemeral=True)
+                    return await interaction.response.send_message(embed=embed, ephemeral=True)
 
                 modal = discord.ui.Modal(new_nick, title="修改你的暱稱", custom_id="nick_modal")
                 modal.on_error = on_modal_error
 
-                await interaction.response.send_modal(modal)
+                return await interaction.response.send_modal(modal)
 
             case "check":
                 cooldown:list = self.bot.setting.managements.get("cooldown", [0, 0, 0])
@@ -105,7 +105,7 @@ class General(CogExtension):
                     description=f"距離下一次修改機會還有 `{':'.join(list(map(str, cooldown)))}`",
                     timestamp=datetime.utcnow()
                 )
-                await interaction.response.send_message(embed=embed, ephemeral=True)
+                return await interaction.response.send_message(embed=embed, ephemeral=True)
 
             case "nick_modal":
                 nick = interaction.data.get("components",{})[0].get("components",{})[0].get("value")
@@ -120,9 +120,7 @@ class General(CogExtension):
                     return await interaction.response.send_message("錯誤! 偵測到不該使用的字元 請你閱讀完修改規則後再重新提交一次申請~", ephemeral=True)
 
                 await interaction.user.edit(nick="〡"+nick)
-                await interaction.response.send_message("已成功修改你的暱稱~", ephemeral=True)
-
-
+                return await interaction.response.send_message("已成功修改你的暱稱~", ephemeral=True)
 
 def setup(bot):
     bot.add_cog(General(bot))
