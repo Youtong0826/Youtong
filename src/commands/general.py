@@ -25,7 +25,7 @@ class General(CogExtension):
 
         embed.add_field(
             name="冷卻時間機制",
-            value="每個人在修改暱稱過後會有一段冷卻時間 不可在同一時間內修改數次暱稱"
+            value="每個人在修改暱稱過後會有一段冷卻時間 避免在同時間內修改數次暱稱"
         )
 
         embed.set_footer(

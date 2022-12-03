@@ -7,9 +7,12 @@ from core.functions import (
     load_extension,
 )
 
-from core.classes import (
-    Setting,
+from core.database import (
     Database
+)
+
+from core.configs import (
+    Setting,
 )
 
 load_dotenv()

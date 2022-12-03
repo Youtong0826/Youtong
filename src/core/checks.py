@@ -22,4 +22,4 @@ if __name__ == "__main__":
 
         return result
 
-    print(test(input()))#Cześć
+    print(test(input()))
