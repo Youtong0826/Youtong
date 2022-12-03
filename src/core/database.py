@@ -8,11 +8,6 @@ from typing import (
     List
 )
 
-from core.functions import (
-    write_json,
-    read_json
-)
-
 load_dotenv()
 
 class Database(Database):
@@ -21,14 +16,14 @@ class Database(Database):
 
         self.data = {
             "block_roles":self.block_roles,
-            "block_words":self.block_words
+            "block_words":self.block_words,
         }
 
     def __str__(self) -> str:
         all = super().get_all()
         return str([(item.key, item.value) for item in all])
 
-    def append(self, key, more, mode="int") -> any:
+    def append(self, key, more, mode="int") -> Any:
         """
         if mode `int` that will add more to the value of key. 
         if mode `list` that will append new obj to the value(list) of key
@@ -56,6 +51,16 @@ class Database(Database):
 
         return None if not self.get("block_words") else (self.set("block_words", new) if isinstance(new, list) else None)
 
+    def set_primary_users(self, new:List[int]):
+        "set the new value to the `primary_users`"
+
+        return None if not self.get("primary_users") else (self.set("primary_users", new) if isinstance(new, list) else None)
+    
+    def set_user_cooldown(self, new:List[List[int]]):
+        "set the new value to the `user_cooldown`"
+
+        return None if not self.get("user_cooldown") else (self.set("user_cooldown", new) if isinstance(new, list) else None)
+
     def append_block_roles(self, role:discord.Role) -> None:
         "append the value to the `block_roles`"
 
@@ -64,6 +69,14 @@ class Database(Database):
     def append_block_words(self, words:str)  -> None:
         "append the value to the `block_words`"
         return None if not self.get("block_words") else self.append("block_words", words, "list")
+
+    def append_primary_users(self, id:int)  -> None:
+        "append the value to the `primary_users`"
+        return None if not self.get("block_words") else self.append("block_words", id)
+
+    def append_user_cooldown(self, id:int)  -> None:
+        "append the value to the `user_cooldown`"
+        return None if not self.get("user_cooldown") else self.append("user_cooldown", id)
 
     @property
     def block_roles(self) -> list:
@@ -79,26 +92,19 @@ class Database(Database):
 
         return self.get("block_words")
 
-class Setting:
-    def __init__(self, path:str, categories:list = []) -> None:
-        self._setting:dict = read_json(path)
-        self.general = self._setting.get("general", {})
-        self.managements = self._setting.get("managements", {})
-        self.database = self._setting.get("database", {})
-        self.checks = self._setting.get("checks", {})
-        self.cog = self._setting.get("cog",{})
-        self.path = path
+    @property
+    def primary_users(self) -> list:
+        if not self.get("primary_users"):
+            self.set("primary_users",[])
 
-    def __str__(self) -> str:
-        return str(self._setting)
+        return self.get("primary_users")
 
-    def add(self, category:str, key:str, value):
-        "add data"
-        return write_json(self.path, category, {key : value})
+    @property
+    def user_cooldown(self) -> list:
+        if not self.get("user_cooldown"):
+            self.set("user_cooldown",[])
 
-    def add_category(self, name:str, default:dict={}):
-        "add new category or value"
-        return write_json(self.path, name ,default)
+        return self.get("user_cooldown")
 
 if __name__ == "__main__":
     pass
