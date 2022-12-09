@@ -2,8 +2,13 @@ import discord
 import os
 
 from discord.ext import commands
+from discord.ui import Item
 from dotenv import load_dotenv
-from typing import List
+
+from typing import (
+    List,
+    Tuple
+)
 
 from core.functions import (
     load_extension,
@@ -15,6 +20,11 @@ from core.database import (
 
 from core.configs import (
     Setting,
+)
+
+from core.item import (
+    Button,
+    Select,
 )
 
 load_dotenv()
@@ -62,8 +72,17 @@ class Bot(commands.Bot):
         self.setting = Setting(self.setting.path) if not path else Setting(path)
         return self.setting
 
-    def fetch_custom_commands(self, name:str) -> List[tuple]:
+    def get_custom_commands(self, name:str) -> List[Tuple[str, dict]]: 
         return list(filter(lambda x:x[0] == name, self.setting.commands))
+
+    def get_buttons_from_dict(self, dict) -> List[Button]: 
+        return [Button.from_dict(data) for data in dict["view"]["items"]["button"]]
+
+    def get_selects_from_dict(self, dict) -> List[Select]:
+        return [Select.from_dict(data) for data in dict["view"]["items"]["select"]]
+
+    def get_items_from_dict(self, dict) -> List[Item]:
+        return [*self.get_buttons_from_dict(dict), *self.get_selects_from_dict(dict)]
 
     async def delete_after_sent(self, ctx:commands.Context, msg:discord.Message, sec:float = 5.0):
         await ctx.message.delete()
