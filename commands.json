@@ -3,35 +3,45 @@
         "embed": {
             "title": "設定",
             "description": "請透過選單進行下一步操作",
-            "fields": {},
-            "footer_text": null
+            "fields": [],
+            "footer": {
+                "text": null,
+                "icon_url": null
+            }
         },
         "view": {
-            "timeout":null,
+            "timeout": null,
             "items": {
-                "main_select": {
-                    "type":"select",
-                    "options": {
-                        "nick_setting": {
-                            "label": "暱稱設定",
-                            "emoji": "📰"
-                        },
-                        "words_setting": {
-                            "label": "文字設定",
-                            "emoji": "📃"
-                        },
-                        "roles_setting": {
-                            "label": "身分組設定",
-                            "emoji": "📜"
-                        },
-                        "other_setting": {
-                            "label": "其他設定",
-                            "emoji": "🔧"
-                        }
-                    },
-                    "custom_id": "main_select_setting",
-                    "placeholder": "請選擇下一步操作"
-                }
+                "button": [],
+                "select": [
+                    {
+                        "select_type":"string_select",
+                        "custom_id": "main_select_setting",
+                        "placeholder": "請選擇下一步操作",
+                        "options": [
+                            {
+                                "label": "暱稱設定",
+                                "value":"nick_setting",
+                                "emoji": "📰"
+                            },
+                            {
+                                "label": "文字設定",
+                                "value":"words_setting",
+                                "emoji": "📃"
+                            },
+                            {
+                                "label": "身分組設定",
+                                "value":"roles_setting",
+                                "emoji": "📜"
+                            },
+                            {
+                                "label": "其他設定",
+                                "value":"other_setting",
+                                "emoji": "🔧"
+                            }
+                        ]
+                    }
+                ]
             }
         }
     },
@@ -39,39 +49,43 @@
         "embed": {
             "title": "暱稱修改系統 (beta)",
             "description": "歡迎使用 `暱稱修改系統` | 請選擇您要進行的操作",
-            "fields": {
-                "rule": {
+            "fields": [
+                {
                     "name": "暱稱修改規則",
                     "value": "**1.** 新的暱稱只允許使用 **數字、英文、中文、日文、韓文**\n**2.** 不能使用的字元像是 **注音、表情符號** 等 **特殊符號**",
                     "inline": true
                 },
-                "cooldown": {
-                    "name": "暱稱修改規則",
+                {
+                    "name": "冷卻時間機制",
                     "value": "每個人在修改暱稱過後會有一段冷卻時間 避免在同時間內修改數次暱稱",
                     "inline": true
                 }
-            },
-            "footer_text": "Nick Modifier | 管理暱稱的最佳選擇"
+            ],
+            "footer": {
+                "text": "Nick Modifier | 管理暱稱的最佳選擇",
+                "icon_url": "https://cdn.discordapp.com/avatars/1038116431683932180/00fda8b8f2f999fd02af866f897cfc8d.png?size=1024"
+            }
         },
         "view": {
-            "timeout":null,
+            "timeout": null,
             "items": {
-                "modify": {
-                    "type": "button",
-                    "row": null,
-                    "style": "success",
-                    "lable": "修改你的暱稱",
-                    "emoji": "🔧",
-                    "custom_id": "modify"
-                },
-                "check_cooldown": {
-                    "type": "button",
-                    "row": null,
-                    "style": "primary",
-                    "lable": "查看冷卻時間",
-                    "emoji": "🕐",
-                    "custom_id": "check"
-                }
+                "button": [
+                    {
+                        "row": null,
+                        "style": "success",
+                        "label": "修改你的暱稱",
+                        "emoji": "🔧",
+                        "custom_id": "modify"
+                    },
+                    {
+                        "row": null,
+                        "style": "primary",
+                        "label": "查看冷卻時間",
+                        "emoji": "🕐",
+                        "custom_id": "check"
+                    }
+                ],
+                "select":[]
             }
         }
     }

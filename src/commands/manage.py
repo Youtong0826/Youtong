@@ -6,45 +6,11 @@ from core.bot import CogExtension
 class Manage(CogExtension):
     
     async def setting(self, ctx:commands.Context):
-        options = {
-            "nick_setting":{
-                "label":"暱稱設定",
-                "emoji":"📰"
-            },
-            "words_setting":{
-                "label":"文字設定",
-                "emoji":"📃"
-            },
-            "roles_setting":{
-                "label":"身分組設定",
-                "emoji":"📜"
-            },
-            "other_setting":{
-                "label":"其他設定",
-                "emoji":"🔧"
-            }
-        }
+        config = self.bot.get_custom_commands("setting")[0][1]
 
         kwargs = {
-            "embed":discord.Embed(
-                title="設定",
-                description="請透過選單進行下一步操作"
-            ),
-            "view":discord.ui.View(
-                discord.ui.Select(
-                    custom_id="main_select_setting",
-                    placeholder="請選擇下一步操作",
-                    options=[
-                        discord.SelectOption(
-                            value=value,
-                            label=option["label"],
-                            emoji=option["emoji"]
-                        )
-                        for value,option in options.items()
-                    ]
-                ),
-                timeout=None
-            )
+            "embed":discord.Embed.from_dict(config["embed"]),
+            "view":discord.ui.View(*self.bot.get_items_from_dict(config))
         }
 
         if isinstance(ctx, commands.Context):

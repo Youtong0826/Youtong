@@ -1,6 +1,11 @@
-from functions import (
+from core.functions import (
     write_json,
     read_json
+)
+
+from typing import (
+    List,
+    Tuple
 )
 
 class BaseCustomCommandObject:
@@ -103,7 +108,7 @@ class CustomCommandConfig:
         return CustomCommandView(self.get(command, "view"))
 
     @property
-    def commands(self):
+    def commands(self) -> List[Tuple[str,dict]]:
         return [(key,value) for key,value in self._data.items()]
 
 class CustomCommand:
@@ -116,7 +121,8 @@ class CustomCommand:
     def __str__(self) -> str:
         return self.name
 
+
 if __name__ == "__main__":
     test = CustomCommand("nick","commands.json")
-    print(test.embed)
+    print(test.embed.fields[0].name)
     print(test.view)

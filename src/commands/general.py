@@ -9,50 +9,22 @@ from core.checks import (
     is_available_language
 )
 
+from core.item import (
+    Button,
+    Select
+)
 class General(CogExtension):
         
     async def nick(self, ctx: commands.Context | discord.ApplicationContext):
-        embed = discord.Embed(
-            title="暱稱修改系統 (beta)",
-            description="歡迎使用 `暱稱修改系統` | 請選擇您要進行的操作",
-            timestamp=datetime.utcnow()
-        )
-
-        embed.add_field(
-            name="暱稱修改規則",
-            value="**1.** 新的暱稱只允許使用 **數字、英文、中文、日文、韓文**\n**2.** 不能使用的字元像是 **注音、表情符號** 等 **特殊符號**"
-        )
-
-        embed.add_field(
-            name="冷卻時間機制",
-            value="每個人在修改暱稱過後會有一段冷卻時間 避免在同時間內修改數次暱稱"
-        )
-
-        embed.set_footer(
-            text="Nick Modifier | 管理暱稱的最佳選擇",
-            icon_url=self.bot.avatar
-        )
-
-        modify = discord.ui.Button(
-            style=discord.ButtonStyle.success,
-            label="修改你的暱稱",
-            emoji="🔧",
-            custom_id="modify"
-        )
-
-        check_cooldown = discord.ui.Button(
-            style=discord.ButtonStyle.primary,
-            label="查看冷卻時間",
-            emoji="🕐",
-            custom_id="check"
-        )
+        config = self.bot.get_custom_commands("nick")[0][1]
+        embed = discord.Embed.from_dict(config["embed"])
+        embed.timestamp = datetime.utcnow()
 
         view = discord.ui.View(
-            modify,
-            check_cooldown,
-            timeout=None
+            *self.bot.get_items_from_dict(config),
+            timeout=config["view"]["timeout"]
         )
-            
+
         if isinstance(ctx, commands.Context):
             await ctx.reply(
                 embed=embed,
@@ -76,6 +48,7 @@ class General(CogExtension):
             
     @commands.Cog.listener()
     async def on_interaction(self, interaction:discord.Interaction):
+        custom_id = self.bot.get_custom_commands()
         match interaction.custom_id:
             case "modify":
                 new_nick = discord.ui.InputText(

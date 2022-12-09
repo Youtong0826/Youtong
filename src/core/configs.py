@@ -9,6 +9,10 @@ from core.functions import (
     read_json
 )
 
+from core.command import (
+    CustomCommandConfig
+)
+
 load_dotenv()
 
 class BaseSetting:
@@ -39,4 +43,7 @@ class Setting(BaseSetting):
         self.general = self.get("general", {})
         self.checks = self.get("checks", {})
         self.cog = self.get("cog",{})
+
+        self.commands_config = CustomCommandConfig("commands.json")
+        self.commands = self.commands_config.commands
     
