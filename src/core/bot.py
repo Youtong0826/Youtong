@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 
 from typing import (
     List,
-    Tuple
+    Tuple,
+    Dict
 )
 
 from core.functions import (
@@ -75,14 +76,29 @@ class Bot(commands.Bot):
     def get_custom_commands(self, name:str) -> List[Tuple[str, dict]]: 
         return list(filter(lambda x:x[0] == name, self.setting.commands))
 
-    def get_buttons_from_dict(self, dict) -> List[Button]: 
+    def get_buttons(self, dict:dict) -> List[Button]: 
         return [Button.from_dict(data) for data in dict["view"]["items"]["button"]]
 
-    def get_selects_from_dict(self, dict) -> List[Select]:
+    def get_selects(self, dict:dict) -> List[Select]:
         return [Select.from_dict(data) for data in dict["view"]["items"]["select"]]
 
-    def get_items_from_dict(self, dict) -> List[Item]:
-        return [*self.get_buttons_from_dict(dict), *self.get_selects_from_dict(dict)]
+    def get_items(self, dict:dict) -> List[Item]:
+        return [*self.get_buttons(dict), *self.get_selects(dict)]
+
+    def get_custom_id(self, name:str, data:dict=None) -> List[str]:
+
+        if not data:
+            data = self.get_custom_commands(name)[0][1]
+
+        result = []
+
+        for k,v in data["view"]["items"].items():
+            result += [i["label"] for i in v]
+
+        return result
+
+    def get_command_with_custom_id(self) -> List[Dict[str, List[str]]]:
+        return [{n: self.get_custom_id(n, v)} for n,v in self.setting.commands]
 
     async def delete_after_sent(self, ctx:commands.Context, msg:discord.Message, sec:float = 5.0):
         await ctx.message.delete()
@@ -97,7 +113,7 @@ class Bot(commands.Bot):
             self.add_check(self.is_test_channel)
 
         if self.is_commands_overload():
-            raise BotBuildError("this bot have too many commands.")
+            raise BotBuildError("this bot have same name custom commands.")
 
         @self.command()
         @commands.check(self.is_administrator)

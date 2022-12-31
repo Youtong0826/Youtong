@@ -10,7 +10,7 @@ class Manage(CogExtension):
 
         kwargs = {
             "embed":discord.Embed.from_dict(config["embed"]),
-            "view":discord.ui.View(*self.bot.get_items_from_dict(config))
+            "view":discord.ui.View(*self.bot.get_items(config))
         }
 
         if isinstance(ctx, commands.Context):

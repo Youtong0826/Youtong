@@ -15,33 +15,108 @@
                 "button": [],
                 "select": [
                     {
-                        "select_type":"string_select",
+                        "select_type": "string",
                         "custom_id": "main_select_setting",
                         "placeholder": "請選擇下一步操作",
                         "options": [
                             {
                                 "label": "暱稱設定",
-                                "value":"nick_setting",
+                                "value": "nick_setting",
                                 "emoji": "📰"
                             },
                             {
                                 "label": "文字設定",
-                                "value":"words_setting",
+                                "value": "words_setting",
                                 "emoji": "📃"
                             },
                             {
                                 "label": "身分組設定",
-                                "value":"roles_setting",
+                                "value": "roles_setting",
                                 "emoji": "📜"
                             },
                             {
                                 "label": "其他設定",
-                                "value":"other_setting",
+                                "value": "other_setting",
                                 "emoji": "🔧"
                             }
                         ]
                     }
-                ]
+                ],
+                "modal": []
+            }
+        },
+        "interaction": {
+            "main_select": {
+                "nick": {
+                    "embed": null,
+                    "view": {
+                        "button": [],
+                        "select": []
+                    },
+                    "modal": {
+                        "title": "暱稱格式設定",
+                        "custom_id": "nick_modal_setting",
+                        "input_text": [
+                            {
+                                "label": "暱稱前方的預設值",
+                                "placeholder": "請輸入指定的預設格式(在暱稱前方)",
+                                "required": false
+                            },
+                            {
+                                "label": "暱稱後方的預設值",
+                                "placeholder": "輸入指定的預設格式(在暱稱後方)",
+                                "required": false
+                            }
+                        ]
+                    }
+                },
+                "words": {
+                    "embed": null,
+                    "view": {
+                        "button": [],
+                        "select": []
+                    },
+                    "modal": {
+                        "title": "文字設定",
+                        "custom_id": "words_modal_setting",
+                        "input_text": [
+                            {
+                                "label": "禁用的文字",
+                                "placeholder": "輸入指定的文字",
+                                "required": false
+                            }
+                        ]
+                    }
+                },
+                "roles": {
+                    "embed": {
+                        "title": "身分組設定",
+                        "description": "請透過下方按鈕來進行操作",
+                        "fields":[],
+                        "footer":null
+                    },
+                    "view": {
+                        "timeout":null,
+                        "button": [
+                            {
+                                "row": null,
+                                "style": "danger",
+                                "label": "禁用的身分組",
+                                "emoji": "📌",
+                                "custom_id": "block_roles_setting"
+                            },
+                            {
+                                "row": null,
+                                "style": "primary",
+                                "label": "具有管理權的身分組",
+                                "emoji": "⚙️",
+                                "custom_id": "admin_roles_setting"
+                            }
+                        ],
+                        "select": []
+                    },
+                    "modal": null
+                }
             }
         }
     },
@@ -85,7 +160,7 @@
                         "custom_id": "check"
                     }
                 ],
-                "select":[]
+                "select": []
             }
         }
     }

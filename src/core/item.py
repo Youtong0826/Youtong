@@ -69,11 +69,11 @@ class Select(Select):
     @classmethod
     def from_dict(self, dict:dict):
         select_define = {
-            "string_select":ComponentType.string_select,
-            "channel_select":ComponentType.channel_select,
-            "mentionable_select":ComponentType.mentionable_select,
-            "role_select":ComponentType.role_select,
-            "user_select":ComponentType.user_select
+            "string":ComponentType.string_select,
+            "channel":ComponentType.channel_select,
+            "mentionable":ComponentType.mentionable_select,
+            "role":ComponentType.role_select,
+            "user":ComponentType.user_select
         }
 
         self = self.__new__(self)
