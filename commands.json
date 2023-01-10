@@ -12,8 +12,8 @@
         "view": {
             "timeout": null,
             "items": {
-                "button": [],
-                "select": [
+                "buttons": [],
+                "selects": [
                     {
                         "select_type": "string",
                         "custom_id": "main_select_setting",
@@ -137,14 +137,14 @@
                 }
             ],
             "footer": {
-                "text": "Nick Modifier | 管理暱稱的最佳選擇",
-                "icon_url": "https://cdn.discordapp.com/avatars/1038116431683932180/00fda8b8f2f999fd02af866f897cfc8d.png?size=1024"
+                "text": "油桐 | 管理暱稱的最佳選擇",
+                "icon_url": "https://cdn.discordapp.com/avatars/1052924829164122192/c3882f9cbd722fb348edf446ffc10f6b.png?size=1024"
             }
         },
         "view": {
             "timeout": null,
             "items": {
-                "button": [
+                "buttons": [
                     {
                         "row": null,
                         "style": "success",
@@ -160,7 +160,7 @@
                         "custom_id": "check"
                     }
                 ],
-                "select": []
+                "selects": []
             }
         }
     }

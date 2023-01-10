@@ -2,6 +2,7 @@ import discord
 import json
 import os
 
+import time
 from datetime import (
     datetime,
     timezone, 
@@ -53,10 +54,25 @@ def write_json(path:str, key:str, *value:dict, keeping:bool =True, is_log:bool =
             ensure_ascii=False
         ))
 
-def now(hours=8):
-    return datetime.now(timezone(timedelta(hours=hours)))
+def get_time(time=None, type:str = None, hours=8):
+    ori = datetime.now(timezone(timedelta(hours=hours))) if not time else time
+    return datetime(
+        ori.year,ori.month,ori.day,
+        ori.hour,ori.minute,ori.second
+    ) if not type else [
+        ori.year,ori.month,ori.day,
+        ori.hour,ori.minute,ori.second,
+    ] if type == "list" else {
+        "year":ori.year,
+        "month":ori.month,
+        "day":ori.day,
+        "hour":ori.hour,
+        "minute":ori.minute,
+        "second":ori.second,
+    }
+
+def creat_unix(dt:datetime):
+    return int(time.mktime(dt.timetuple()))
 
 if __name__ == "__main__":
-
-    def string_to_list(string):
-        return str(list(string)).replace("'",'"')
+    ...

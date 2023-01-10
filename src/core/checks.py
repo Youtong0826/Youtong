@@ -5,13 +5,13 @@ def is_emoji(content:str):
     result = re.findall(regexp, content, re.UNICODE)
     result += re.findall("<:\w+:\d+>|<\w+:\w+:\d+>",content) 
 
-    return False if len(result) == 0 else True
+    return not len(result) == 0
 
 def is_available_language(content:str):
     regexp = u"[\u4E00-\u9FFF]|[\uAC00-\uD7A3]|[\u3041-\u309f]|[\u0000-\u007F]"
     result = re.findall(regexp, content, re.UNICODE)
     
-    return False if len(list(filter(lambda x:x not in result, content))) > 0 else True
+    return not len(list(filter(lambda x:x not in result, content))) > 0
 
 if __name__ == "__main__":
     def test(data:str):

@@ -13,7 +13,7 @@ from discord import (
 )
 
 def is_button(dict:dict) -> bool:
-        return dict["type"] == "button"
+    return dict["type"] == "button"
 
 def is_select(dict:dict) -> bool:
     return dict["type"] == "select"

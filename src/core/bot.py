@@ -5,6 +5,8 @@ from discord.ext import commands
 from discord.ui import Item
 from dotenv import load_dotenv
 
+from datetime import datetime
+
 from typing import (
     List,
     Tuple,
@@ -49,10 +51,45 @@ class Bot(commands.Bot):
         self.id = self.setting.general.get("id",0)
 
         self.cooldown = self.setting.managements.get("cooldown", [0, 0, 0])
-        self.vips = self.setting.managements.get("vips", [0, 0, 0])
+
+    def get_vips(self):
+        return Database(self.database_path).primary_users
+
+    def get_database(self):
+        return Database(self.database_path)
+
+    def get_user_cooldown(self, id:int | str): 
+        return None if str(id) not in self.database.user_cooldown else datetime(**self.database.user_cooldown.get(str(id)))
+
+    def get_custom_commands(self, name:str) -> List[Tuple[str, dict]]: 
+        return list(filter(lambda x:x[0] == name, self.setting.commands))
+
+    def get_buttons(self, dict:dict) -> List[Button]: 
+        return [Button.from_dict(data) for data in dict["view"]["items"]["buttons"]]
+
+    def get_selects(self, dict:dict) -> List[Select]:
+        return [Select.from_dict(data) for data in dict["view"]["items"]["selects"]]
+
+    def get_items(self, dict:dict) -> List[Item]:
+        return [*self.get_buttons(dict), *self.get_selects(dict)]
+
+    def get_custom_id(self, name:str, data:dict=None) -> List[str]:
+
+        if not data:
+            data = self.get_custom_commands(name)[0][1]
+
+        result = []
+
+        for k,v in data["view"]["items"].items():
+            result += [i["label"] for i in v]
+
+        return result
+
+    def get_command_with_custom_id(self) -> List[Dict[str, List[str]]]:
+        return [{n: self.get_custom_id(n, v)} for n,v in self.setting.commands]
 
     def is_administrator(self, ctx:commands.Context):
-        return ctx.author.guild_permissions.administrator or ctx.author.id in self.vips
+        return ctx.author.guild_permissions.administrator or ctx.author.id in self.get_vips()
 
     def is_available_channel(self, ctx:commands.Context):
         return ctx.channel.id in self.setting.checks["channel"]
@@ -72,33 +109,6 @@ class Bot(commands.Bot):
     def reload_setting(self, path:str = None):
         self.setting = Setting(self.setting.path) if not path else Setting(path)
         return self.setting
-
-    def get_custom_commands(self, name:str) -> List[Tuple[str, dict]]: 
-        return list(filter(lambda x:x[0] == name, self.setting.commands))
-
-    def get_buttons(self, dict:dict) -> List[Button]: 
-        return [Button.from_dict(data) for data in dict["view"]["items"]["button"]]
-
-    def get_selects(self, dict:dict) -> List[Select]:
-        return [Select.from_dict(data) for data in dict["view"]["items"]["select"]]
-
-    def get_items(self, dict:dict) -> List[Item]:
-        return [*self.get_buttons(dict), *self.get_selects(dict)]
-
-    def get_custom_id(self, name:str, data:dict=None) -> List[str]:
-
-        if not data:
-            data = self.get_custom_commands(name)[0][1]
-
-        result = []
-
-        for k,v in data["view"]["items"].items():
-            result += [i["label"] for i in v]
-
-        return result
-
-    def get_command_with_custom_id(self) -> List[Dict[str, List[str]]]:
-        return [{n: self.get_custom_id(n, v)} for n,v in self.setting.commands]
 
     async def delete_after_sent(self, ctx:commands.Context, msg:discord.Message, sec:float = 5.0):
         await ctx.message.delete()
