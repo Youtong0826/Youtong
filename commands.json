@@ -7,83 +7,71 @@
             "footer": {
                 "text": null,
                 "icon_url": null
-            }
+            },
+            "timestamp": null
         },
         "view": {
             "timeout": null,
-            "items": {
-                "buttons": [],
-                "selects": [
-                    {
-                        "select_type": "string",
-                        "custom_id": "main_select_setting",
-                        "placeholder": "請選擇下一步操作",
-                        "options": [
-                            {
-                                "label": "暱稱設定",
-                                "value": "nick_setting",
-                                "emoji": "📰"
-                            },
-                            {
-                                "label": "文字設定",
-                                "value": "words_setting",
-                                "emoji": "📃"
-                            },
-                            {
-                                "label": "身分組設定",
-                                "value": "roles_setting",
-                                "emoji": "📜"
-                            },
-                            {
-                                "label": "其他設定",
-                                "value": "other_setting",
-                                "emoji": "🔧"
-                            }
-                        ]
-                    }
-                ],
-                "modal": []
-            }
+            "buttons": [],
+            "selects": [
+                {
+                    "select_type": "string",
+                    "custom_id": "main_select_setting",
+                    "placeholder": "請選擇下一步操作",
+                    "options": [
+                        {
+                            "label": "暱稱設定",
+                            "value": "nick_setting",
+                            "emoji": "📰"
+                        },
+                        {
+                            "label": "文字設定",
+                            "value": "words_setting",
+                            "emoji": "📃"
+                        },
+                        {
+                            "label": "身分組設定",
+                            "value": "roles_setting",
+                            "emoji": "📜"
+                        },
+                        {
+                            "label": "其他設定",
+                            "value": "other_setting",
+                            "emoji": "🔧"
+                        }
+                    ]
+                }
+            ]
         },
         "interaction": {
             "main_select": {
+                "type":"select",
                 "nick": {
-                    "embed": null,
-                    "view": {
-                        "button": [],
-                        "select": []
-                    },
                     "modal": {
                         "title": "暱稱格式設定",
                         "custom_id": "nick_modal_setting",
                         "input_text": [
                             {
+                                "style": "short",
                                 "label": "暱稱前方的預設值",
-                                "placeholder": "請輸入指定的預設格式(在暱稱前方)",
-                                "required": false
+                                "placeholder": "請輸入指定的預設格式(在暱稱前方)"
                             },
                             {
+                                "style": "short",
                                 "label": "暱稱後方的預設值",
-                                "placeholder": "輸入指定的預設格式(在暱稱後方)",
-                                "required": false
+                                "placeholder": "輸入指定的預設格式(在暱稱後方)"
                             }
                         ]
                     }
                 },
                 "words": {
-                    "embed": null,
-                    "view": {
-                        "button": [],
-                        "select": []
-                    },
                     "modal": {
                         "title": "文字設定",
                         "custom_id": "words_modal_setting",
                         "input_text": [
                             {
                                 "label": "禁用的文字",
-                                "placeholder": "輸入指定的文字",
-                                "required": false
+                                "placeholder": "輸入指定的文字"
                             }
                         ]
                     }
@@ -139,29 +127,27 @@
             "footer": {
                 "text": "油桐 | 管理暱稱的最佳選擇",
                 "icon_url": "https://cdn.discordapp.com/avatars/1052924829164122192/c3882f9cbd722fb348edf446ffc10f6b.png?size=1024"
-            }
+            },
+            "timestamp": "<now>"
         },
         "view": {
-            "timeout": null,
-            "items": {
-                "buttons": [
-                    {
-                        "row": null,
-                        "style": "success",
-                        "label": "修改你的暱稱",
-                        "emoji": "🔧",
-                        "custom_id": "modify"
-                    },
-                    {
-                        "row": null,
-                        "style": "primary",
-                        "label": "查看冷卻時間",
-                        "emoji": "🕐",
-                        "custom_id": "check"
-                    }
-                ],
-                "selects": []
-            }
+            "buttons": [
+                {
+                    "row": null,
+                    "style": "success",
+                    "label": "修改你的暱稱",
+                    "emoji": "🔧",
+                    "custom_id": "modify"
+                },
+                {
+                    "row": null,
+                    "style": "primary",
+                    "label": "查看冷卻時間",
+                    "emoji": "🕐",
+                    "custom_id": "check"
+                }
+            ],
+            "selects": []
         }
     }
 }

@@ -15,64 +15,20 @@ from core.functions import (
 )
 
 class General(CogExtension):
-        
-    async def nick(self, ctx: commands.Context | discord.ApplicationContext):
-        config = self.bot.get_custom_commands("nick")[0][1]
-        embed = discord.Embed.from_dict(config["embed"])
-        embed.timestamp = datetime.utcnow()
+    def __init__(self, bot: discord.Bot | commands.Bot) -> None:
+        super().__init__(bot)
 
-        view = discord.ui.View(
-            *self.bot.get_items(config),
-            timeout=config["view"]["timeout"]
-        )
+        self.bot.build_custom_command("nick", "暱稱", "管理你的你稱")
+        self.bot.build_custom_command("setting", "暱稱設定", "管理暱稱設定")
 
-        if isinstance(ctx, commands.Context):
-            await ctx.reply(
-                embed=embed,
-                view=view,
-                mention_author=False
-            )
+    async def upload(self, ctx: commands.Context | discord.ApplicationContext, file: discord.Attachment):
+        await file.save(self.bot.setting.path)
 
-        elif isinstance(ctx, discord.ApplicationContext):
-            await ctx.response.send_message(
-                embed=embed,
-                view=view
-            )
+        await ctx.response.send_message("Hello!", ephemeral=True)
 
-    async def setting(self, ctx:commands.Context):
-        config = self.bot.get_custom_commands("setting")[0][1]
-
-        kwargs = {
-            "embed":discord.Embed.from_dict(config["embed"]),
-            "view":discord.ui.View(*self.bot.get_items(config))
-        }
-
-        if isinstance(ctx, commands.Context):
-            await ctx.reply(
-                mention_author=False,
-                **kwargs
-            )
-
-        else:
-            await ctx.respond(
-                **kwargs
-            )
-
-    @discord.application_command(name="暱稱", description="管理你的暱稱")
-    async def slash_nick(self, ctx:discord.ApplicationContext):
-        await self.nick(ctx)
-
-    @discord.application_command(name="暱稱設定", description="管理暱稱設定")
-    async def slash_setting(self, ctx):
-        await self.setting(ctx)
-
-    @commands.command(name="nick", description="管理你的暱稱")
-    async def text_nick(self, ctx:commands.Context):
-        await self.nick(ctx)
-
-    @commands.command(name="setting")
-    async def text_setting(self, ctx):
-        await self.setting(ctx)
+    @discord.application_command(name="上傳設定擋", description="上傳暱稱設定檔案(json)")
+    async def slash_upload(self, ctx, file: discord.Option(discord.Attachment, "設定檔(json)")):
+        await self.upload(ctx, file)
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction:discord.Interaction):
@@ -223,7 +179,7 @@ class General(CogExtension):
                     return await interaction.response.send_message("錯誤! 偵測到不該使用的字元", ephemeral=True)
                 
                 if  user_cooldown is not None and user_cooldown > get_time():
-                    return await interaction.response.send_message(f"你已經修改過了! <t:{creat_unix(user_cooldown)}:R> 才能在修改一次")
+                    return await interaction.response.send_message(f"你已經修改過了! <t:{creat_unix(user_cooldown)}:R> 才能在修改一次", ephemeral=True)
 
                 try:
                     #await interaction.user.edit(nick="〡"+nick)

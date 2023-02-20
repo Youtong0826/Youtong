@@ -20,8 +20,8 @@ class Other(CogExtension):
         "R": ["相對時間", "2 months ago"]
     }
 
-    timestamp_format:dict[str, str] = {}
-    original_time:dict[str, str] = {}
+    timestamp_format: dict[str, str] = {}
+    original_time: dict[str, str] = {}
 
     @discord.application_command(name="生成timestamp", description="將日期轉為timestamp")
     async def timestamp(self, ctx:discord.ApplicationContext):

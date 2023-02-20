@@ -1,6 +1,8 @@
 from discord.ui import (
     Button,
-    Select
+    Select,
+    View,
+    Item
 )
 
 from discord import (
@@ -34,20 +36,20 @@ class Button(Button):
     def from_dict(self, dict:dict):
         self = self.__new__(self)
 
-        button_define = {
-            "success":ButtonStyle.success,
-            "danger":ButtonStyle.danger,
-            "link":ButtonStyle.link,
-            "primary":ButtonStyle.primary,
-            "grey":ButtonStyle.secondary,
+        stlye = {
+            "success": ButtonStyle.success,
+            "danger": ButtonStyle.danger,
+            "link": ButtonStyle.link,
+            "primary": ButtonStyle.primary,
+            "grey": ButtonStyle.secondary,
         }
 
         self.__init__(
-            row = dict.get("row"),
-            style = button_define[dict.get("style","secondary")],
-            label = dict.get("label"),
-            emoji = dict.get("emoji"),
-            custom_id = dict.get("custom_id")
+            row=dict.get("row"),
+            style=stlye[dict.get("style","secondary")],
+            label=dict.get("label"),
+            emoji=dict.get("emoji"),
+            custom_id=dict.get("custom_id")
         )
 
         return self
@@ -89,3 +91,23 @@ class Select(Select):
         )
 
         return self
+
+class View(View):
+    def __init__(self, *items: Item, timeout: float | None = 180, disable_on_timeout: bool = False):
+        super().__init__(*items, timeout=timeout, disable_on_timeout=disable_on_timeout)
+
+    @classmethod
+    def from_dict(self, data: dict):
+        self = self.__new__(self)
+        self.__init__(
+            items=(
+                *(Button.from_dict(d) for d in data.get("buttons")),
+                *(Select.from_dict(d) for d in data.get("selects"))
+            ),
+            timeout=data.get("timeout")
+        )
+
+        return self
+
+if __name__ == "__main__":
+    ... #test

@@ -9,11 +9,13 @@ from core.functions import (
     read_json
 )
 
-from core.command import (
+from core.customized import (
     CustomCommandConfig
 )
 
 load_dotenv()
+
+data: hello = "hello"
 
 class BaseSetting:
     def __init__(self, path:str) -> None:

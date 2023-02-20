@@ -9,7 +9,7 @@ from datetime import (
     timedelta
 )
 
-def load_extension(bot:discord.Bot, folder:str, mode:str="load", is_notice:bool=True) -> None:
+def load_extension(bot:  discord.Bot, folder:str, mode: str = "load", is_notice: bool = True) -> None:
 
     loading_method = {
         "load":bot.load_extension,
@@ -30,7 +30,7 @@ def load_extension(bot:discord.Bot, folder:str, mode:str="load", is_notice:bool=
 
     return None
 
-def merge_dict(*dicts:dict) -> dict:
+def merge_dict(*dicts: dict) -> dict:
     raw = {}
 
     for d in dicts:
@@ -38,11 +38,11 @@ def merge_dict(*dicts:dict) -> dict:
 
     return raw
 
-def read_json(path:str) -> dict:
+def read_json(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as file:
         return json.loads(file.read())
 
-def write_json(path:str, key:str, *value:dict, keeping:bool =True, is_log:bool = True):
+def write_json(path:str, key: str, *value: dict, keeping: bool = True):
     new = original = read_json(path) if keeping else {}
     new[key] = merge_dict(original.get(key,{}),*value)
 
@@ -54,25 +54,48 @@ def write_json(path:str, key:str, *value:dict, keeping:bool =True, is_log:bool =
             ensure_ascii=False
         ))
 
-def get_time(time=None, type:str = None, hours=8):
+def get_time(time = None, type: str = datetime, hours = 8):
     ori = datetime.now(timezone(timedelta(hours=hours))) if not time else time
-    return datetime(
-        ori.year,ori.month,ori.day,
-        ori.hour,ori.minute,ori.second
-    ) if not type else [
-        ori.year,ori.month,ori.day,
-        ori.hour,ori.minute,ori.second,
-    ] if type == "list" else {
-        "year":ori.year,
-        "month":ori.month,
-        "day":ori.day,
-        "hour":ori.hour,
-        "minute":ori.minute,
-        "second":ori.second,
-    }
+    return type(ori.year, ori.month, ori.day, ori.hour, ori.minute, ori.second)
 
 def creat_unix(dt:datetime):
     return int(time.mktime(dt.timetuple()))
 
+class A:
+        __private = 0
+        public = 0
+
+        def get_value(self):
+            return f"private:{self.__private}\npublic:{self.public}"
+
+        def set_private(self, value):
+            self.__private = value
+
+        def set_public(self, value):
+            self.public = value
+
+        def __test(self):
+            print("test")
+
 if __name__ == "__main__":
-    ...
+    
+    a = A()
+    a.__private = 10
+    a.public = 10
+    print(a.get_value())
+
+    print("----------")
+
+    a.set_private(10)
+    a.set_public(20)
+    print(a.get_value())
+
+    print("--------")
+
+    a._A__private = 30
+    print(a.get_value())
+
+    print("--------")
+
+    a._A__test()
+

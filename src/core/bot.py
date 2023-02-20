@@ -1,33 +1,23 @@
 import discord
 import os
 
-from discord.ext import commands
-from discord.ui import Item
+from datetime import datetime
 from dotenv import load_dotenv
 
-from datetime import datetime
+from discord.ext import commands
+from discord.ui import Item
+
+from core.functions import load_extension
+from core.database import Database
+from core.configs import Setting
+from core.embed import Embed
+
+from core.item import View
+from core.modal import Modal
 
 from typing import (
     List,
-    Tuple,
     Dict
-)
-
-from core.functions import (
-    load_extension,
-)
-
-from core.database import (
-    Database
-)
-
-from core.configs import (
-    Setting,
-)
-
-from core.item import (
-    Button,
-    Select,
 )
 
 load_dotenv()
@@ -52,31 +42,22 @@ class Bot(commands.Bot):
 
         self.cooldown = self.setting.managements.get("cooldown", [0, 0, 0])
 
+    def _get_custom_commands_config(self, name: str) -> dict: 
+        return list(filter(lambda x:x[0] == name, self.setting.commands))[0][1]
+
     def get_vips(self):
         return Database(self.database_path).primary_users
 
     def get_database(self):
         return Database(self.database_path)
 
-    def get_user_cooldown(self, id:int | str): 
+    def get_user_cooldown(self, id: int | str): 
         return None if str(id) not in self.database.user_cooldown else datetime(**self.database.user_cooldown.get(str(id)))
 
-    def get_custom_commands(self, name:str) -> List[Tuple[str, dict]]: 
-        return list(filter(lambda x:x[0] == name, self.setting.commands))
-
-    def get_buttons(self, dict:dict) -> List[Button]: 
-        return [Button.from_dict(data) for data in dict["view"]["items"]["buttons"]]
-
-    def get_selects(self, dict:dict) -> List[Select]:
-        return [Select.from_dict(data) for data in dict["view"]["items"]["selects"]]
-
-    def get_items(self, dict:dict) -> List[Item]:
-        return [*self.get_buttons(dict), *self.get_selects(dict)]
-
-    def get_custom_id(self, name:str, data:dict=None) -> List[str]:
+    def get_custom_id(self, name: str, data: dict = None) -> List[str]:
 
         if not data:
-            data = self.get_custom_commands(name)[0][1]
+            data = self._get_custom_commands_config(name)
 
         result = []
 
@@ -85,16 +66,38 @@ class Bot(commands.Bot):
 
         return result
 
+    async def response(self, interaction: discord.Interaction, data: dict):
+
+        if data.get("embed"):
+            embed = Embed.from_dict(data["embed"]) 
+        if data.get("view"):
+            view = View.from_dict(data["view"])
+        if data.get("modal"):
+            modal = Modal.from_dict(data["modal"])
+        if modal:
+            await interaction.response.send_modal(modal)
+        if embed or view:
+            await interaction.response.send_message(embed=embed, view=view)
+
+    def get_select_interaction_response(self, interaction: discord.Interaction, data: dict):
+        return {k: self.response(interaction, v) for k, v in data.items()}
+
+    def get_interaction_responses(self, interaction: discord.Interaction, key: str):
+        config: dict[str, dict] = self._get_custom_commands_config(key)["interaction"]
+        
+        return {k: self.response(interaction, v) for k, v in config.items()}
+
+
     def get_command_with_custom_id(self) -> List[Dict[str, List[str]]]:
         return [{n: self.get_custom_id(n, v)} for n,v in self.setting.commands]
 
-    def is_administrator(self, ctx:commands.Context):
+    def is_administrator(self, ctx: commands.Context):
         return ctx.author.guild_permissions.administrator or ctx.author.id in self.get_vips()
 
-    def is_available_channel(self, ctx:commands.Context):
+    def is_available_channel(self, ctx: commands.Context):
         return ctx.channel.id in self.setting.checks["channel"]
 
-    def is_test_channel(self, ctx:commands.Context):
+    def is_test_channel(self, ctx: commands.Context):
         return ctx.channel.id in self.setting.checks["test_channel"]
 
     def is_commands_overload(self):
@@ -106,11 +109,42 @@ class Bot(commands.Bot):
 
         return False
 
+    def build_custom_command(self, config_key: str, name: str, description: str):
+        
+        async def callback(ctx):
+            config = self._get_custom_commands_config(config_key)
+            embed = Embed.from_dict(config["embed"])
+
+            view = View.from_dict(config["view"])
+
+            if isinstance(ctx, commands.Context):
+                await ctx.reply(
+                    embed=embed,
+                    view=view,
+                    mention_author=False
+                )
+
+            elif isinstance(ctx, discord.ApplicationContext):
+                await ctx.response.send_message(
+                    embed=embed,
+                    view=view
+                )
+
+        @self.application_command(name=name, description=description)
+        async def application(ctx):
+            await callback(ctx)
+            
+        @self.command(name=config_key)
+        async def command(ctx):
+            await callback(ctx)
+
+        return callback
+
     def reload_setting(self, path:str = None):
         self.setting = Setting(self.setting.path) if not path else Setting(path)
         return self.setting
 
-    async def delete_after_sent(self, ctx:commands.Context, msg:discord.Message, sec:float = 5.0):
+    async def delete_after_sent(self, ctx: commands.Context, msg: discord.Message, sec: float = 5.0):
         await ctx.message.delete()
         await msg.delete(delay=sec)
 
@@ -155,3 +189,7 @@ class Bot(commands.Bot):
 class CogExtension(discord.Cog):
     def __init__(self, bot:Bot) -> None:
         self.bot = bot
+
+
+if __name__ == "__main__":
+    pass
