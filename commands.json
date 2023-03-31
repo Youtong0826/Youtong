@@ -15,7 +15,7 @@
             "buttons": [],
             "selects": [
                 {
-                    "select_type": "string",
+                    "type": "string",
                     "custom_id": "main_select_setting",
                     "placeholder": "請選擇下一步操作",
                     "options": [
@@ -42,70 +42,6 @@
                     ]
                 }
             ]
-        },
-        "interaction": {
-            "main_select": {
-                "type":"select",
-                "nick": {
-                    "modal": {
-                        "title": "暱稱格式設定",
-                        "custom_id": "nick_modal_setting",
-                        "input_text": [
-                            {
-                                "style": "short",
-                                "label": "暱稱前方的預設值",
-                                "placeholder": "請輸入指定的預設格式(在暱稱前方)"
-                            },
-                            {
-                                "style": "short",
-                                "label": "暱稱後方的預設值",
-                                "placeholder": "輸入指定的預設格式(在暱稱後方)"
-                            }
-                        ]
-                    }
-                },
-                "words": {
-                    "modal": {
-                        "title": "文字設定",
-                        "custom_id": "words_modal_setting",
-                        "input_text": [
-                            {
-                                "label": "禁用的文字",
-                                "placeholder": "輸入指定的文字"
-                            }
-                        ]
-                    }
-                },
-                "roles": {
-                    "embed": {
-                        "title": "身分組設定",
-                        "description": "請透過下方按鈕來進行操作",
-                        "fields":[],
-                        "footer":null
-                    },
-                    "view": {
-                        "timeout":null,
-                        "button": [
-                            {
-                                "row": null,
-                                "style": "danger",
-                                "label": "禁用的身分組",
-                                "emoji": "📌",
-                                "custom_id": "block_roles_setting"
-                            },
-                            {
-                                "row": null,
-                                "style": "primary",
-                                "label": "具有管理權的身分組",
-                                "emoji": "⚙️",
-                                "custom_id": "admin_roles_setting"
-                            }
-                        ],
-                        "select": []
-                    },
-                    "modal": null
-                }
-            }
         }
     },
     "nick": {
@@ -115,7 +51,7 @@
             "fields": [
                 {
                     "name": "暱稱修改規則",
-                    "value": "**1.** 新的暱稱只允許使用 **數字、英文、中文、日文、韓文**\n**2.** 不能使用的字元像是 **注音、表情符號** 等 **特殊符號**",
+                    "value": "新的暱稱只允許使用 **數字、英文、中文、日文、韓文**\n不能使用的字元像是 **注音、表情符號** 等 **特殊符號**",
                     "inline": true
                 },
                 {
