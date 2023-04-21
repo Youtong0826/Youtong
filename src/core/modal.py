@@ -24,6 +24,8 @@ class InputText(InputText):
             style=style[data.get("style")],
             label=data.get("label"),
             placeholder=data.get("placeholder"),
+            custom_id=data.get("custom_id"),
+            required=data.get("required", False)
         )
 
         return children
@@ -36,8 +38,8 @@ class Modal(Modal):
     def from_dict(self, data: dict):
         modal = self.__new__(self)
         modal.__init__(
+            *(InputText.from_dict(d) for d in data.get("input_text")),
             title=data.get("title"),
-            children=(InputText.from_dict(d) for d in data.get("input_text")),
             custom_id=data.get("custom_id")
         )
 
