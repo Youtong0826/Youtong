@@ -1,20 +1,20 @@
 import re
 
-def is_emoji(content:str):
+def is_emoji(content: str):
     regexp = u'[\u2600-\u26FF]|[\u2700-\u27BF]|[\U0001f300-\U0001f5fF]|[\U0001f600-\U0001f64F]|[\U0001f680-\U0001f6FF]'
     result = re.findall(regexp, content, re.UNICODE)
-    result += re.findall("<:\w+:\d+>|<\w+:\w+:\d+>",content) 
+    result += re.findall("<:\w+:\d+>|<\w+:\w+:\d+>", content) 
 
     return not len(result) == 0
 
-def is_available_language(content:str):
+def is_available_language(content: str):
     regexp = u"[\u4E00-\u9FFF]|[\uAC00-\uD7A3]|[\u3041-\u309f]|[\u0000-\u007F]"
     result = re.findall(regexp, content, re.UNICODE)
     
-    return not len(list(filter(lambda x:x not in result, content))) > 0
+    return not len(list(filter(lambda x: x not in result, content)))
 
 if __name__ == "__main__":
-    def test(data:str):
+    def test(data: str):
         result = []
         for i,d in enumerate(data.split()):
             result.append((d, ch:=is_available_language(d)))

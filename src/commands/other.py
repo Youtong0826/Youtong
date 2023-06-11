@@ -4,7 +4,7 @@ import time
 import datetime
 
 from core.bot import CogExtension
-from core.item import (
+from core.view import (
     Button,
     Select
 )

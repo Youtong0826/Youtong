@@ -15,36 +15,36 @@ from core.customized import (
 
 load_dotenv()
 
-data: hello = "hello"
-
 class BaseSetting:
     def __init__(self, path:str) -> None:
-        self._setting:dict = read_json(path)
         self.path = path
-    
-    def get(self, key:str, default:Any = {}):
-        return self._setting.get(key, default)
 
-    def add(self, category:str, key:str, value):
-        "add data"
+    @property
+    def _data(self):
+        return read_json(self.path)
+
+    def set(self, category: str, key: str, value: Any):
         return write_json(self.path, category, {key : value})
+    
+    def get(self, key: str, default:Any = {}):
+        return self._data.get(key, default)
 
-    def add_category(self, name:str, default:dict={}):
+    def add_category(self, name: str, default: dict = {}):
         "add new category or value"
         return write_json(self.path, name ,default)
 
     def __str__(self) -> str:
-        return str(self._setting)
+        return str(self._data)
 
 class Setting(BaseSetting):
     def __init__(self, path: str) -> None:
         super().__init__(path)
 
-        self.managements = self.get("managements", {})
-        self.database = self.get("database", {})
-        self.general = self.get("general", {})
-        self.checks = self.get("checks", {})
-        self.cog = self.get("cog",{})
+        self.managements: dict = self.get("managements", {})
+        self.database: dict = self.get("database", {})
+        self.general: dict = self.get("general", {})
+        self.checks: dict = self.get("checks", {})
+        self.cog: dict = self.get("cog",{})
         self.commands_config = CustomCommandConfig("commands.json")
         self.commands = self.commands_config.commands
     

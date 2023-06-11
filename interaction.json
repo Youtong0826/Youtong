@@ -4,17 +4,19 @@
         "nick": {
             "modal": {
                 "title": "暱稱格式設定",
-                "custom_id": "nick_modal_setting",
+                "custom_id": "nick_format_setting",
                 "input_text": [
                     {
                         "style": "short",
-                        "label": "暱稱前方的預設值",
-                        "placeholder": "請輸入指定的預設格式(在暱稱前方)"
+                        "label": "暱稱開頭的預設值",
+                        "placeholder": "請輸入指定的預設格式",
+                        "custom_id": "start"
                     },
                     {
                         "style": "short",
-                        "label": "暱稱後方的預設值",
-                        "placeholder": "輸入指定的預設格式(在暱稱後方)"
+                        "label": "暱稱結尾的預設值",
+                        "placeholder": "輸入指定的預設格式",
+                        "custom_id": "end"
                     }
                 ]
             }
@@ -26,8 +28,15 @@
                 "input_text": [
                     {
                         "style": "short",
-                        "label": "禁用的文字",
-                        "placeholder": "輸入指定的文字"
+                        "label": "新增禁用的文字",
+                        "placeholder": "輸入文字",
+                        "custom_id": "add"
+                    },
+                    {
+                        "style": "short",
+                        "label": "解除禁用的文字",
+                        "placeholder": "輸入文字",
+                        "custom_id": "remove"
                     }
                 ]
             }
@@ -35,7 +44,7 @@
         "roles": {
             "ephemeral":true,
             "embed": {
-                "title": "身分組設定",
+                "title": "黑名單設定",
                 "description": "請透過下方按鈕來進行操作",
                 "fields":[]
             },
@@ -44,17 +53,27 @@
                 "buttons": [
                     {
                         "row": null,
-                        "style": "danger",
-                        "label": "禁用的身分組",
-                        "emoji": "📌",
-                        "custom_id": "block_roles_setting"
+                        "style": "primary",
+                        "label": "新增身分組",
+                        "custom_id": "add_block_roles_setting"
                     },
                     {
                         "row": null,
+                        "style": "danger",
+                        "label": "移除身分組",
+                        "custom_id": "remove_block_roles_setting"
+                    },
+                    {
+                        "row": 1,
                         "style": "primary",
-                        "label": "具有管理權的身分組",
-                        "emoji": "⚙️",
-                        "custom_id": "admin_roles_setting"
+                        "label": "新增用戶",
+                        "custom_id": "add_block_user_setting"
+                    },
+                    {
+                        "row": 1,
+                        "style": "danger",
+                        "label": "移除用戶",
+                        "custom_id": "remove_block_user_setting"
                     }
                 ],
                 "selects": []
@@ -62,10 +81,10 @@
         },
         "other":{}
     },
-    "block_roles": {
+    "add_block_roles": {
         "ephemeral":true,
         "embed": {
-            "title": "禁用身分組設定",
+            "title": "新增黑名單身分組",
             "description": "請從以下選單選擇身分組",
             "fields":[]
         },
@@ -77,15 +96,15 @@
                     "type": "role",
                     "placeholder": "選擇身分組",
                     "max_values": 25,
-                    "custom_id": "block_roles_select_setting"
+                    "custom_id": "add_block_roles_select_setting"
                 }
             ]
         }
     },
-    "admin_roles": {
+    "remove_block_roles": {
         "ephemeral":true,
         "embed": {
-            "title": "管理權身分組設定",
+            "title": "移除黑名單身分組",
             "description": "請從以下選單選擇身分組",
             "fields":[]
         },
@@ -97,10 +116,59 @@
                     "type": "role",
                     "placeholder": "選擇身分組",
                     "max_values": 25,
-                    "custom_id": "admin_roles_select_setting"
+                    "custom_id": "remove_block_roles_select_setting"
                 }
             ]
         }
+    },
+    "add_block_user": {
+        "ephemeral":true,
+        "embed": {
+            "title": "新增黑名單成員",
+            "description": "請從以下選單選擇身分組",
+            "fields":[]
+        },
+        "view": {
+            "timeout": null,
+            "buttons": [],
+            "selects": [
+                {
+                    "type": "role",
+                    "placeholder": "選擇身分組",
+                    "max_values": 25,
+                    "custom_id": "add_block_user_select_setting"
+                }
+            ]
+        }
+    },
+    "remove_block_user": {
+        "ephemeral":true,
+        "embed": {
+            "title": "移除黑名單成員",
+            "description": "請從以下選單選擇身分組",
+            "fields":[]
+        },
+        "view": {
+            "timeout": null,
+            "buttons": [],
+            "selects": [
+                {
+                    "type": "user",
+                    "placeholder": "選擇身分組",
+                    "max_values": 25,
+                    "custom_id": "remove_block_user_select_setting"
+                }
+            ]
+        }
+    },
+    "block_roles_select": {
+        "title":"成功新增✅",
+        "description":"身分組: {name}"
+    },
+    "admin_roles_select": {
+        "title":"成功新增✅",
+        "description":"身分組: {name}"
+        
     },
     "modify": {
         "modal": {
@@ -119,11 +187,34 @@
     },
     "nick_modal": {
         "cooling": "你已經修改過了! {time} 才能在修改一次",
-        "end_cooling": "已成功修改你的暱稱~ 新暱稱:{nick}"
+        "end_cooling": "已成功修改你的暱稱~ 新暱稱:{name}"
     },
-    "check":{
-        "cooling":"{time} 才能修改一次",
-        "end_cooling":"冷卻已結束!",
-        "color":"6495ED"
+    "check": {
+        "cooling": "{time} 才能修改一次",
+        "end_cooling": "冷卻已結束!"
+    },
+    "nick_format": {
+        "content": "設定成功~"
+    },
+    "words_modal": {
+        "content": "設定成功~",
+        "already_in": "`{word}` 已存在於資料庫內",
+        "not_in": "`{word}` 未存在於資料庫內"
+    },
+    "add_block_roles_select":{
+        "already_in": "`{role}` 已存在於資料庫內",
+        "not_in": "`{role}` 未存在於資料庫內"
+    },
+    "remove_block_roles_select":{
+        "already_in": "`{role}` 已存在於資料庫內",
+        "not_in": "`{role}` 未存在於資料庫內"
+    },
+    "add_block_user_select":{
+        "already_in": "`{user}` 已存在於資料庫內",
+        "not_in": "`{user}` 未存在於資料庫內"
+    },
+    "remove_block_user_select":{
+        "already_in": "`{user}` 已存在於資料庫內",
+        "not_in": "`{user}` 未存在於資料庫內"
     }
 } 

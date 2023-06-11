@@ -3,10 +3,15 @@ import json
 import os
 
 import time
+
 from datetime import (
     datetime,
     timezone, 
     timedelta
+)
+
+from typing import(
+    Any
 )
 
 def load_extension(bot:  discord.Bot, folder:str, mode: str = "load", is_notice: bool = True) -> None:
@@ -40,9 +45,14 @@ def merge_dict(*dicts: dict) -> dict:
 
 def read_json(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as file:
-        return json.loads(file.read())
+        try:
+            data = json.loads(file.read())
+        except Exception as ex:
+            print(ex)
+            data = None
+        return data
 
-def write_json(path:str, key: str, *value: dict, keeping: bool = True):
+def write_json(path: str, key: str, *value: dict, keeping: bool = True):
     new = original = read_json(path) if keeping else {}
     new[key] = merge_dict(original.get(key,{}),*value)
 
@@ -50,52 +60,31 @@ def write_json(path:str, key: str, *value: dict, keeping: bool = True):
         return file.write(json.dumps(
             new,
             indent=4,
-            separators=(",",":"),
+            separators=(",", ": "),
             ensure_ascii=False
         ))
 
-def get_time(time = None, type: str = datetime, hours = 8):
+def get_time(time: datetime = None, hours = 8):
     ori = datetime.now(timezone(timedelta(hours=hours))) if not time else time
-    return type(ori.year, ori.month, ori.day, ori.hour, ori.minute, ori.second)
+    return datetime(ori.year, ori.month, ori.day, ori.hour, ori.minute, ori.second)
 
-def creat_unix(dt:datetime):
+def get_time_map(time = None, hours = 8):
+    ori = datetime.now(timezone(timedelta(hours=hours))) if not time else time
+    return {
+        "year": ori.year, 
+        "month" : ori.month, 
+        "day" : ori.day, 
+        "hour" : ori.hour, 
+        "minute" : ori.minute, 
+        "second" : ori.second
+    }
+
+def rep_str(string: str,**kwargs):
+    return [(string := string.replace("{%s}" % k, str(v))) for k, v in kwargs.items()][len(kwargs)-1]
+
+def creat_unix(dt: datetime):
     return int(time.mktime(dt.timetuple()))
 
-class A:
-        __private = 0
-        public = 0
-
-        def get_value(self):
-            return f"private:{self.__private}\npublic:{self.public}"
-
-        def set_private(self, value):
-            self.__private = value
-
-        def set_public(self, value):
-            self.public = value
-
-        def __test(self):
-            print("test")
-
 if __name__ == "__main__":
-    
-    a = A()
-    a.__private = 10
-    a.public = 10
-    print(a.get_value())
-
-    print("----------")
-
-    a.set_private(10)
-    a.set_public(20)
-    print(a.get_value())
-
-    print("--------")
-
-    a._A__private = 30
-    print(a.get_value())
-
-    print("--------")
-
-    a._A__test()
-
+    str1 = "hello {name} {age}"
+    print(rep_str(str1, name="Youtong", age=18))

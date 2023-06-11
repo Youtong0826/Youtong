@@ -1,5 +1,6 @@
 {
     "setting": {
+        "checks": ["is_administrator"],
         "embed": {
             "title": "設定",
             "description": "請透過選單進行下一步操作",

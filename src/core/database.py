@@ -48,10 +48,14 @@ class Database(Database):
         "set the new value to the `block_words`"
         return self.set("block_words", new if isinstance(new, list) else []) 
 
-    def set_primary_users(self, new:List[int]):
-        "set the new value to the `primary_users`"
-        return self.set("primary_users", new if isinstance(new, list) else []) 
-    
+    def set_block_user(self, new: List[int]) -> None:
+        "append the `user_id` to the `block_user`"
+        return self.set("block_user", new if isinstance(new, list) else [])
+
+    def set_admin_users(self, new:List[int]):
+        "set the new value to the `admin_users`"
+        return self.set("admin_user", new if isinstance(new, list) else []) 
+
     def set_user_cooldown(self, id, year, month, day, hour, minute, second):
         "set the new value to the `user_cooldown`"
 
@@ -67,51 +71,59 @@ class Database(Database):
 
         return self.set("user_cooldown", ori) 
 
-    def append_block_roles(self, role:int) -> None:
-        "append the value to the `block_roles`"
-        return self.append("block_roles", role, "list")
+    def append_block_roles(self, role: int) -> None:
+        "append the `role_id` to the `block_roles`"
+        return self.append("block_roles", role)
+    
+    def append_block_user(self, id: int) -> None:
+        "append the `user_id` to the `block_user`"
+        return self.append("block_user", id)
 
-    def append_block_words(self, words:str)  -> None:
-        "append the value to the `block_words`"
-        return self.append("block_words", words, "list")
+    def append_block_words(self, words: str)  -> None:
+        "append the `words` to the `block_words`"
+        return self.append("block_words", words)
 
-    def append_primary_users(self, id:int)  -> None:
-        "append the value to the `primary_users`"
-        return self.append("primary_users", id)
-
-    def append_primary_users(self, id:int)  -> None:
-        "append the value to the `primary_users`"
-        return self.append("primary_users", id)
+    def append_admin_user(self, id: int)  -> None:
+        "append the `user_id` to the `admin_users`"
+        return self.append("admin_user", id)
 
     def remove_block_roles(self, id) -> None:
-        "delete the value to the `block_roles`"
+        "remove the `role_id` in the `block_roles`"
         return self.remove("block_roles", id)
 
-    def remove_block_words(self, words:str)  -> None:
-        "delete the value to the `block_words`"
-        return self.remove("block_words", words,)
+    def remove_block_words(self, words: str)  -> None:
+        "remove the `words` in the `block_words`"
+        return self.remove("block_words", words)
 
-    def remove_primary_users(self, id:int)  -> None:
-        "delete the value to the `primary_users`"
-        return self.remove("primary_users", id)
+    def remove_block_user(self, id: int) -> None:
+        "remove the `user_id` in the `block_user`"
+        return self.set("block_user", id)
+
+    def remove_admin_users(self, id: int)  -> None:
+        "delete the `user_id` to the `admin_users`"
+        return self.remove("admin_users", id)
 
     @property
     def block_roles(self) -> list:
-        return self.get("block_roles")
+        return self.get("block_roles", [])
         
     @property
     def block_words(self) -> list:
-        return self.get("block_words")
+        return self.get("block_words", [])
 
     @property
-    def primary_users(self) -> list:
-        return self.get("primary_users")
+    def block_user(self) -> list:
+        return self.get("block_user", [])
+
+    @property
+    def admin_users(self) -> list:
+        return self.get("admin_user", [])
 
     @property
     def user_cooldown(self) -> dict[str, dict[str,str]]:
-        return self.get("user_cooldown")
+        return self.get("user_cooldown", {})
     
 if __name__ == "__main__":
     db = Database("bot.db")
-    db.reset("user_cooldown")
+    db.reset("block_words")
 

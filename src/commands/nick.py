@@ -1,5 +1,4 @@
 import discord
-import time
 
 from discord.ext import commands
 from datetime import datetime, timedelta
@@ -11,161 +10,51 @@ from core.checks import (
 
 from core.functions import (
     get_time,
-    creat_unix    
+    get_time_map,
+    creat_unix,
+    rep_str
 )
+
 
 class General(CogExtension):
     def __init__(self, bot: discord.Bot | commands.Bot) -> None:
         super().__init__(bot)
 
-        self.bot.build_custom_command("nick", "暱稱", "管理你的你稱")
+        self.bot.build_custom_command("nick", "暱稱", "管理你的暱稱")
         self.bot.build_custom_command("setting", "暱稱設定", "管理暱稱設定")
 
     async def upload(self, ctx: commands.Context | discord.ApplicationContext, file: discord.Attachment):
-        await file.save(self.bot.setting.path)
+        #await file.save(self.bot.setting.path)
 
         await ctx.response.send_message("Hello!", ephemeral=True)
 
-    @discord.application_command(name="上傳設定擋", description="上傳暱稱設定檔案(json)")
-    async def slash_upload(self, ctx, file: discord.Option(discord.Attachment, "設定檔(json)")):
+
+    #@discord.application_command(name="上傳設定擋", description="上傳暱稱設定檔案(json)")
+    async def slash_upload(self, ctx: commands.Context, file: discord.Option(discord.Attachment, "設定檔(json)")):
         await self.upload(ctx, file)
+
+    @discord.application_command(name="禁用文字", description="查詢被禁用的文字")
+    async def show_block_words(self, ctx: discord.ApplicationContext):
+        await ctx.respond(f'以下為被禁用的文字```{", ".join(self.bot.database.block_words)}```')
 
     @commands.Cog.listener()
     async def on_interaction(self, interaction:discord.Interaction):
 
-        if interaction.custom_id and interaction.custom_id.endswith("_setting"):
-            match interaction.custom_id.replace("_setting", ""):
-                case "main_select":
-                    match interaction.data.get("values",[""])[0].replace("_setting", ""):
-                        case "nick":
-                            await interaction.response.send_modal(
-                                discord.ui.Modal(
-                                    discord.ui.InputText(
-                                        label="暱稱前方的預設值",
-                                        placeholder="請輸入指定的預設格式(在暱稱前方)",
-                                        required=False
-                                    ), 
-                                    discord.ui.InputText(
-                                        label="暱稱後方的預設值",
-                                        placeholder="輸入指定的預設格式(在暱稱後方)",
-                                        required=False
-                                    ),
-                                    title="暱稱格式設定", 
-                                    custom_id="nick_modal_setting"
-                                )
-                            )
+        if interaction.custom_id:
+            custom_id = interaction.custom_id.replace("_setting", "") if interaction.custom_id.endswith("_setting") else interaction.custom_id
+            data = self.bot.get_interaction_data(custom_id) 
+            values = self.bot.get_interaction_value(interaction)
 
-                        case "words":
-                            await interaction.response.send_modal(
-                                discord.ui.Modal(
-                                    discord.ui.InputText(
-                                        label="禁用的文字",
-                                        placeholder="輸入指定的文字",
-                                    ),
-                                    discord.ui.InputText(
-                                        label="特殊身分組禁用的文字",
-                                        placeholder="輸入指定的文字"
-                                    ),
-                                    title="文字設定", 
-                                    custom_id="words_modal_setting"
-                                )
-                            )
+            async def append_data(mode: int = 0):
+                values = self.bot.get_select_value(interaction)
+                for v in values:
+                    if mode == 0 and v in self.bot.database.block_roles:
+                        return await interaction.response.send_message(data["already_in"], role=interaction.guild.get_role(int(v)).mention)
 
-                        case "roles":
-                            await interaction.response.send_message(
-                                embed=discord.Embed(
-                                    title="身分組設定",
-                                    description="請透過下方按鈕來進行操作"
-                                ),
-                                view=discord.ui.View(
-                                    discord.ui.Button(
-                                        style=discord.ButtonStyle.danger,
-                                        label="禁用的身分組",
-                                        custom_id="block_roles_setting",
-                                        emoji="📌"
-                                    ),
-                                    discord.ui.Button(
-                                        style=discord.ButtonStyle.primary,
-                                        label="具有管理權的身分組",
-                                        custom_id="admin_roles_setting",
-                                        emoji="⚙️"
-                                    ),
-                                    timeout=None
-                                ),
-                                ephemeral=True
-                            )
+                    self.bot.database.append_block_user(int(v))
 
-                        case "other":
-                            await interaction.response.send_message(
-                                "此功能暫時停用~",
-                                ephemeral=True
-                            )
-
-                case "block_roles":
-                    await interaction.response.send_message(
-                        embed=discord.Embed(
-                            title="禁用身分組設定",
-                            description="請從以下選單選擇身分組"
-                        ),
-                        view=discord.ui.View(
-                            discord.ui.Select(
-                                select_type=discord.ComponentType.role_select,
-                                placeholder="選擇身分組",
-                                max_values=25,
-                                custom_id="block_roles_select_setting"
-                            ),
-                            timeout=None
-                        ),
-                        ephemeral=True
-                    )
-
-                case "admin_roles":
-                    await interaction.response.send_message(
-                        embed=discord.Embed(
-                            title="管理權身分組設定",
-                            description="請從以下選單選擇身分組"
-                        ),
-                        view=discord.ui.View(
-                            discord.ui.Select(
-                                select_type=discord.ComponentType.role_select,
-                                placeholder="選擇身分組",
-                                max_values=25,
-                                custom_id="admin_roles_select_setting"
-                            ),
-                            timeout=None
-                        ),
-                        ephemeral=True
-                    )
-
-        match interaction.custom_id:
-            case "modify":
-                new_nick = discord.ui.InputText(
-                    label="新暱稱",
-                    placeholder="輸入你的新暱稱",
-                    min_length=1,
-                    max_length=16
-                )        
-
-                modal = discord.ui.Modal(new_nick, title="修改你的暱稱", custom_id="nick_modal")
-
-                return await interaction.response.send_modal(modal)
-
-            case "check":
-                cooldown = self.bot.get_user_cooldown(interaction.user.id)
-                unix_time  = creat_unix(cooldown)
-                description = f"<t:{unix_time}:R> 才能修改一次"
-
-                if not cooldown or cooldown <= get_time():
-                    description = "冷卻已結束!"
-                
-                embed = discord.Embed(
-                    title="冷卻時間",
-                    description=description
-                )
-                return await interaction.response.send_message(embed=embed, ephemeral=True)
-
-            case "nick_modal":         
-                nick = interaction.data.get("components",{})[0].get("components",{})[0].get("value")
+            if custom_id == "nick_modal":
+                nick = values[0]
                 user_cooldown = self.bot.get_user_cooldown(interaction.user.id)
 
                 if not nick:
@@ -175,32 +64,100 @@ class General(CogExtension):
                     )
                     return await interaction.response.send_message(embed=embed, ephemeral=True)
                 
-                if len(list(filter(lambda x:x in self.bot.database.block_words, nick))) > 0 or is_emoji(nick) or (not is_available_language(nick)):
+                if len(list(filter(lambda x:x in self.bot.database.block_words, nick))) or is_emoji(nick) or (not is_available_language(nick)):
                     return await interaction.response.send_message("錯誤! 偵測到不該使用的字元", ephemeral=True)
                 
-                if  user_cooldown is not None and user_cooldown > get_time():
-                    return await interaction.response.send_message(f"你已經修改過了! <t:{creat_unix(user_cooldown)}:R> 才能在修改一次", ephemeral=True)
+                if  user_cooldown and user_cooldown > get_time():
+                    unix = f"<t:{creat_unix(user_cooldown)}:R>"
+                    return await interaction.response.send_message(rep_str(data["cooling"], time=unix), ephemeral=True)
 
                 try:
-                    #await interaction.user.edit(nick="〡"+nick)
-                    cooldown = datetime(**get_time(type="dict"))+timedelta(minutes=30.0)
+                    managements = self.bot.setting.managements
+                    nick = managements.get("start_word", "") + nick + managements.get("end_word", "")
+                    await interaction.user.edit(nick=nick)
+                    config: list[int] = self.bot.setting.managements["cooldown"]
+                    cooldown = get_time()+timedelta(
+                        hours=config[0],
+                        minutes=config[1],
+                        seconds=config[2]
+                    )
                     
-                    self.bot.database.set_user_cooldown(interaction.user.id, **get_time(cooldown, type="dict"))
-                    return await interaction.response.send_message("已成功修改你的暱稱~", ephemeral=True)
+                    self.bot.database.set_user_cooldown(interaction.user.id, **get_time_map(cooldown))
+                    return await interaction.response.send_message(rep_str(data["end_cooling"], nick), ephemeral=True)
 
                 except discord.errors.Forbidden as error:
-                    match error.text:
-                        case "Missing Permissions":
-                            return await interaction.response.send_message("權限不足!", ephemeral=True)
+                    if error.text == "Missing Permissions":
+                        return await interaction.response.send_message("權限不足!", ephemeral=True)
 
-                        case _:
-                            embed = discord.Embed(
-                                title="錯誤! 表單好像出了點問題>< 請將此情形回報給開發者們",
-                                description=f"```Msg: {error.text}\nStatus: {error.status}\nCode: {error.code}```"
-                            )
+                    else:
+                        embed = discord.Embed(
+                            title="錯誤! 表單好像出了點問題>< 請將此情形回報給開發者們",
+                            description=f"```Msg: {error.text}\nStatus: {error.status}\nCode: {error.code}```"
+                        )
 
-                            return await interaction.response.send_message(embed=embed, ephemeral=True)
+                        return await interaction.response.send_message(embed=embed, ephemeral=True)
+                        
+            elif custom_id == "check":
+                cooldown = self.bot.get_user_cooldown(interaction.user.id)
+                description = data["end_cooling"]
 
-def setup(bot):
+                if cooldown and cooldown >= get_time():
+                    unix_time  = creat_unix(cooldown)
+                    description = rep_str(data["cooling"], time=f"<t:{unix_time}:R>")
+
+                return await interaction.response.send_message(description, ephemeral=True)
+
+            elif custom_id == "nick_format":
+                
+                self.bot.setting.set("managements",
+                    "start_word", values[0] 
+                ) if values[0] != "" else None
+
+                self.bot.setting.set("managements",
+                    "end_word", values[1]
+                ) if values[1] != "" else None
+                
+                return await interaction.response.send_message(data["content"], ephemeral=True)
+            
+            elif custom_id == "words_modal":
+  
+                if values[0] in self.bot.database.block_words:
+                    return await interaction.response.send_message(rep_str(data["already_in"], word=values[0]), ephemeral=True)
+                
+                if values[1] != "" and values[1] not in self.bot.database.block_words:
+                    return await interaction.response.send_message(rep_str(data["not_in"], word=values[1]), ephemeral=True)
+
+                self.bot.database.append_block_words(
+                    values[0] ) if values[0] != "" else None
+                
+                self.bot.database.remove_block_words(
+                    values[1] ) if values[1] != "" else None
+
+                return await interaction.response.send_message(data["content"], ephemeral=True)
+
+            elif custom_id == "add_block_roles_select":
+                values = self.bot.get_select_value(interaction)
+                for v in values:
+                    if v in self.bot.database.block_roles:
+                        return await interaction.response.send_message(data["already_in"], role=interaction.guild.get_role(int(v)).mention)
+
+                    self.bot.database.append_block_user(int(v))
+
+            elif custom_id == "remove_roles_select": 
+                ...
+
+            if data.get("type") == "select":
+                try:
+                    data = self.bot.get_select_interaction_data(custom_id, self.bot.get_select_value(interaction, 0))
+
+                except IndexError:
+                    return await interaction.response.send_message("請重試一次!", ephemeral=True)
+
+            await self.bot.interaction_respond(interaction, data)
+
+             
+
+
+def setup(bot: discord.Bot):
     bot.add_cog(General(bot))
     
