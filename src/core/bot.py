@@ -29,7 +29,7 @@ class Bot(commands.Bot):
         super().__init__(command_prefix, description, *args, **options)
 
         self.setting_path = setting_path
-        self.database_path = self.setting.database.get("path","bot.db")
+        self.database_path = self.setting.database.get("path", "bot.db")
 
         self.token:str = os.getenv("TOKEN")
 

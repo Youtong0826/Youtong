@@ -1,3 +1,7 @@
+# Ignore all files with the specified name.
+# Scope is all repo folders.
+.vscode
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
